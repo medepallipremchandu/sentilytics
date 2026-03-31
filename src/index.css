@@ -1,0 +1,224 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    background: var(--theme-bg, #0f1117);
+    @apply min-h-screen;
+    color: var(--theme-text, #ffffff);
+    @apply font-sans;
+    @apply antialiased;
+  }
+}
+
+:root.theme-dark {
+  --theme-bg: #090a0e;
+  --theme-text: #f8fafc;
+}
+
+:root.theme-light {
+  --theme-bg: #f1f5f9;
+  --theme-text: #0f172a;
+  --surface-card: #ffffff;
+  --surface-soft: #f8fafc;
+  --surface-muted: #e2e8f0;
+  --border-strong: #cbd5e1;
+  --border-soft: #e2e8f0;
+}
+
+@layer utilities {
+  .glass-effect {
+    @apply bg-white/10 backdrop-blur-lg border border-white/20;
+  }
+  
+  .gradient-text {
+    @apply bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent;
+  }
+  
+  .glow-effect {
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
+  }
+  
+  .animate-gradient-x {
+    background-size: 200% 200%;
+    animation: gradient 8s ease infinite;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(139, 92, 246, 0.5);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(139, 92, 246, 0.7);
+}
+
+/* Light mode utility remaps for existing dark classes */
+:root.theme-light .bg-slate-950 { background-color: #f1f5f9 !important; }
+:root.theme-light .bg-slate-900 { background-color: #ffffff !important; }
+:root.theme-light .bg-slate-800 { background-color: #e2e8f0 !important; }
+:root.theme-light .bg-slate-700 { background-color: #cbd5e1 !important; }
+:root.theme-light .text-white { color: #0f172a !important; }
+:root.theme-light .text-slate-500 { color: #64748b !important; }
+:root.theme-light .text-slate-400 { color: #475569 !important; }
+:root.theme-light .text-slate-300 { color: #334155 !important; }
+:root.theme-light .text-slate-200 { color: #1e293b !important; }
+:root.theme-light .text-slate-100 { color: #0f172a !important; }
+:root.theme-light .text-amber-200 { color: #92400e !important; }
+:root.theme-light .text-emerald-200 { color: #065f46 !important; }
+:root.theme-light .text-sky-200 { color: #0c4a6e !important; }
+:root.theme-light .text-cyan-200 { color: #0e7490 !important; }
+:root.theme-light .text-indigo-200 { color: #3730a3 !important; }
+:root.theme-light .text-violet-200 { color: #5b21b6 !important; }
+:root.theme-light .text-red-200 { color: #991b1b !important; }
+:root.theme-light .text-yellow-200 { color: #92400e !important; }
+:root.theme-light .text-gray-200 { color: #334155 !important; }
+:root.theme-light .text-gray-300 { color: #334155 !important; }
+:root.theme-light .text-gray-400 { color: #475569 !important; }
+:root.theme-light .text-gray-500 { color: #64748b !important; }
+:root.theme-light .text-gray-600 { color: #64748b !important; }
+:root.theme-light .border-slate-900 { border-color: #e2e8f0 !important; }
+:root.theme-light .border-slate-800 { border-color: #cbd5e1 !important; }
+:root.theme-light .border-slate-700 { border-color: #cbd5e1 !important; }
+:root.theme-light .bg-black\/60 { background-color: rgba(15, 23, 42, 0.35) !important; }
+:root.theme-light .border-white\/20 { border-color: #cbd5e1 !important; }
+:root.theme-light .border-white\/10 { border-color: #e2e8f0 !important; }
+:root.theme-light .bg-white\/10 { background-color: #ffffff !important; }
+:root.theme-light .bg-white\/15 { background-color: #f8fafc !important; }
+:root.theme-light .bg-slate-900\/40 { background-color: #f8fafc !important; }
+:root.theme-light .bg-slate-900\/70 { background-color: #e2e8f0 !important; }
+:root.theme-light .bg-slate-900\/90 { background-color: #dbe3ef !important; }
+:root.theme-light .bg-slate-900\/50 { background-color: #f1f5f9 !important; }
+:root.theme-light .bg-slate-900\/30 { background-color: #f8fafc !important; }
+:root.theme-light .bg-black\/30 { background-color: #f8fafc !important; }
+:root.theme-light .bg-white\/10 { background-color: #ffffff !important; }
+:root.theme-light .bg-white\/5 { background-color: #f8fafc !important; }
+:root.theme-light .bg-red-500\/10 { background-color: #fee2e2 !important; }
+:root.theme-light .bg-red-500\/8 { background-color: #fef2f2 !important; }
+:root.theme-light .bg-green-500\/10 { background-color: #dcfce7 !important; }
+:root.theme-light .bg-green-500\/8 { background-color: #f0fdf4 !important; }
+:root.theme-light .bg-blue-500\/10 { background-color: #dbeafe !important; }
+:root.theme-light .bg-yellow-500\/10 { background-color: #fef3c7 !important; }
+:root.theme-light .bg-purple-500\/10 { background-color: #ede9fe !important; }
+:root.theme-light .bg-purple-500\/8 { background-color: #f5f3ff !important; }
+:root.theme-light .bg-cyan-500\/10 { background-color: #cffafe !important; }
+:root.theme-light .bg-blue-500\/20 { background-color: #bfdbfe !important; }
+:root.theme-light .bg-purple-500\/15 { background-color: #ddd6fe !important; }
+:root.theme-light .bg-cyan-500\/10 { background-color: #cffafe !important; }
+:root.theme-light .bg-green-500\/20 { background-color: #bbf7d0 !important; }
+:root.theme-light .bg-purple-500\/20 { background-color: #ddd6fe !important; }
+:root.theme-light .shadow-2xl { box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08) !important; }
+:root.theme-light .bg-amber-500\/15 { background-color: #fde68a !important; }
+:root.theme-light .bg-emerald-500\/15 { background-color: #a7f3d0 !important; }
+:root.theme-light .bg-sky-500\/15 { background-color: #bae6fd !important; }
+:root.theme-light .bg-cyan-500\/15 { background-color: #a5f3fc !important; }
+:root.theme-light .bg-indigo-500\/15 { background-color: #c7d2fe !important; }
+:root.theme-light .bg-red-500\/15 { background-color: #fecaca !important; }
+:root.theme-light .bg-yellow-500\/15 { background-color: #fde68a !important; }
+:root.theme-light .bg-amber-500\/10 { background-color: #fef3c7 !important; }
+:root.theme-light .bg-violet-500\/10 { background-color: #ede9fe !important; }
+:root.theme-light .border-amber-400\/25 { border-color: #f59e0b !important; }
+:root.theme-light .border-emerald-400\/25 { border-color: #10b981 !important; }
+:root.theme-light .border-sky-400\/25 { border-color: #0ea5e9 !important; }
+:root.theme-light .border-cyan-400\/25 { border-color: #06b6d4 !important; }
+:root.theme-light .border-indigo-400\/25 { border-color: #6366f1 !important; }
+:root.theme-light .border-red-400\/25 { border-color: #ef4444 !important; }
+:root.theme-light .border-yellow-400\/25 { border-color: #f59e0b !important; }
+:root.theme-light .border-amber-400\/40 { border-color: #f59e0b !important; }
+:root.theme-light .border-violet-400\/40 { border-color: #7c3aed !important; }
+:root.theme-light .border-red-500\/20 { border-color: #fca5a5 !important; }
+:root.theme-light .border-red-500\/15 { border-color: #fecaca !important; }
+:root.theme-light .border-green-500\/20 { border-color: #86efac !important; }
+:root.theme-light .border-green-500\/15 { border-color: #bbf7d0 !important; }
+:root.theme-light .border-blue-500\/30 { border-color: #60a5fa !important; }
+:root.theme-light .border-blue-500\/20 { border-color: #93c5fd !important; }
+:root.theme-light .border-yellow-500\/40 { border-color: #f59e0b !important; }
+:root.theme-light .border-yellow-500\/30 { border-color: #fbbf24 !important; }
+:root.theme-light .border-purple-500\/40 { border-color: #a78bfa !important; }
+:root.theme-light .border-purple-500\/30 { border-color: #c4b5fd !important; }
+:root.theme-light .border-purple-500\/25 { border-color: #c4b5fd !important; }
+:root.theme-light .border-purple-500\/20 { border-color: #ddd6fe !important; }
+:root.theme-light .border-purple-500\/15 { border-color: #e9d5ff !important; }
+:root.theme-light .border-cyan-500\/20 { border-color: #67e8f9 !important; }
+
+/* Existing custom hex backgrounds used in app screens */
+:root.theme-light .bg-\[\#090a0e\] { background-color: #f1f5f9 !important; }
+:root.theme-light .bg-\[\#101116\] { background-color: #ffffff !important; }
+:root.theme-light .bg-\[\#111218\] { background-color: #ffffff !important; }
+:root.theme-light .bg-\[\#12131a\] { background-color: #ffffff !important; }
+:root.theme-light .bg-\[\#14151b\] { background-color: #f8fafc !important; }
+:root.theme-light .bg-\[\#191a20\] { background-color: #f8fafc !important; }
+:root.theme-light .bg-\[\#1a1b22\] { background-color: #f8fafc !important; }
+
+/* Form readability in light mode */
+:root.theme-light input,
+:root.theme-light textarea,
+:root.theme-light select {
+  color: #0f172a !important;
+}
+
+:root.theme-light input {
+  border-color: #cbd5e1 !important;
+}
+
+/* Final consistency pass: card/input/border harmonization in light mode */
+:root.theme-light .glass-effect {
+  background-color: var(--surface-card) !important;
+  border-color: var(--border-strong) !important;
+  backdrop-filter: none !important;
+}
+
+:root.theme-light .rounded-2xl,
+:root.theme-light .rounded-xl,
+:root.theme-light .rounded-lg {
+  border-color: var(--border-soft);
+}
+
+:root.theme-light input::placeholder,
+:root.theme-light textarea::placeholder {
+  color: #64748b !important;
+}
+
+:root.theme-light select option {
+  color: #0f172a !important;
+  background: #ffffff !important;
+}
+
+/* Native selects: closed state must stay readable in light mode (hex bg remaps alone are not enough on some browsers) */
+:root.theme-light select.fb-select {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+
+:root.theme-light select.fb-select option,
+:root.theme-light select.fb-select optgroup {
+  color: #0f172a !important;
+  background-color: #ffffff !important;
+}
+
+/* Profile menu: Tailwind hover:bg-slate-800 is not remapped for :hover — was dark-on-dark in light mode */
+:root.theme-light .profile-menu {
+  background-color: #ffffff !important;
+  border-color: #cbd5e1 !important;
+}
+
+:root.theme-light .profile-menu button {
+  color: #0f172a !important;
+}
+
+:root.theme-light .profile-menu button:hover {
+  background-color: #e2e8f0 !important;
+  color: #0f172a !important;
+}

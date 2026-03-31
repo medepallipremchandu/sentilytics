@@ -1,15 +1,45 @@
 import React from 'react'
 import { motion } from 'framer-motion'
 import { DollarSign, Zap, Clock, Activity } from 'lucide-react'
+import InfoTip from './common/InfoTip'
 
 const UsageStats = ({ usage, hasAudio }) => {
   if (!usage) return null
 
+  const whisperCost = Number(usage.whisper_cost_usd || 0)
+  const gptCost = Number(usage.gpt_cost_usd || 0)
+  const totalCost = Number(usage.total_cost_usd || 0)
+
   const rows = [
-    hasAudio && { label: 'Whisper Duration', value: `${usage.whisper_duration_minutes} min`, sub: `$${usage.whisper_cost_usd?.toFixed(4)}`, icon: Clock, color: 'border-blue-500/30 from-blue-500/10 to-cyan-500/10' },
-    { label: 'GPT Tokens', value: (usage.gpt_total_tokens || 0).toLocaleString(), sub: `↓${usage.gpt_prompt_tokens} ↑${usage.gpt_completion_tokens}`, icon: Zap, color: 'border-purple-500/30 from-purple-500/10 to-pink-500/10' },
-    { label: 'GPT Cost', value: `$${usage.gpt_cost_usd?.toFixed(4)}`, sub: 'USD', icon: DollarSign, color: 'border-yellow-500/30 from-yellow-500/10 to-orange-500/10' },
-    { label: 'Total Cost', value: `$${usage.total_cost_usd?.toFixed(4)}`, sub: 'USD', icon: Activity, color: 'border-green-500/30 from-green-500/10 to-emerald-500/10', highlight: true },
+    hasAudio && {
+      label: 'Whisper Duration',
+      value: `${usage.whisper_duration_minutes} min`,
+      sub: `$${whisperCost.toFixed(4)}`,
+      icon: Clock,
+      color: 'border-blue-500/30 from-blue-500/10 to-cyan-500/10',
+    },
+    {
+      label: 'GPT Tokens',
+      value: (usage.gpt_total_tokens || 0).toLocaleString(),
+      sub: `↓${usage.gpt_prompt_tokens} ↑${usage.gpt_completion_tokens}`,
+      icon: Zap,
+      color: 'border-purple-500/30 from-purple-500/10 to-pink-500/10',
+    },
+    {
+      label: 'GPT Cost',
+      value: `$${gptCost.toFixed(4)}`,
+      sub: 'Input + output tokens (USD)',
+      icon: DollarSign,
+      color: 'border-yellow-500/30 from-yellow-500/10 to-orange-500/10',
+    },
+    {
+      label: 'Total Cost',
+      value: `$${totalCost.toFixed(4)}`,
+      sub: hasAudio ? `Whisper $${whisperCost.toFixed(4)} + GPT $${gptCost.toFixed(4)}` : `GPT $${gptCost.toFixed(4)}`,
+      icon: Activity,
+      color: 'border-green-500/30 from-green-500/10 to-emerald-500/10',
+      highlight: true,
+    },
   ].filter(Boolean)
 
   return (
@@ -18,7 +48,11 @@ const UsageStats = ({ usage, hasAudio }) => {
     >
       <div className="flex items-center gap-2 mb-4">
         <Activity className="w-5 h-5 text-green-400" />
-        <h3 className="font-bold">API Usage & Cost</h3>
+        <h3 className="font-bold">API Usage &amp; Cost</h3>
+        <InfoTip
+          text="GPT cost is calculated from Azure token usage: (prompt tokens × input price/1K) + (completion tokens × output price/1K). Total cost combines GPT cost with Whisper transcription cost (duration × per‑minute price). Prices are configured to match your Azure OpenAI pricing."
+          className="ml-1"
+        />
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">

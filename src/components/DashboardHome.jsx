@@ -14,6 +14,7 @@ import {
 import { Bar, BarChart, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { motion } from 'framer-motion'
 import { useTheme } from './ThemeSwitcher'
+import { APP_LOGO } from '../lib/branding'
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -339,7 +340,7 @@ export default function DashboardHome({
               whileHover={{ scale: 1.05 }}
               transition={{ type: 'spring', stiffness: 400, damping: 22 }}
             >
-              <img src="/app-logo.svg" alt="" className="h-9 w-9 rounded-lg border border-white/10 bg-black/30 p-1 shadow-inner" />
+              <img src={APP_LOGO} alt="" className="h-9 w-9 rounded-lg border border-white/10 bg-black/30 p-1 shadow-inner" />
               <span className="absolute -bottom-0.5 -right-0.5 flex h-2.5 w-2.5 items-center justify-center rounded-full border border-[#0c0d12] bg-emerald-400">
                 <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-200" />
               </span>
@@ -562,7 +563,7 @@ export default function DashboardHome({
         <ChartCard title="Shortcuts" icon={<LayoutDashboard className="h-3 w-3" />}>
           <div className="flex flex-col gap-1.5">
             <ActionChip
-              icon={<img src="/app-logo.svg" alt="" className="h-4 w-4 opacity-90" />}
+              icon={<img src={APP_LOGO} alt="" className="h-4 w-4 opacity-90" />}
               label="All feedback"
               onClick={() => onNavigateToBoard?.({})}
             />
@@ -576,7 +577,7 @@ export default function DashboardHome({
       <motion.div variants={itemVariants} className="overflow-hidden rounded-xl border border-white/10 bg-slate-900/90">
         <div className="flex items-center justify-between gap-2 border-b border-white/10 px-2.5 py-2">
           <div className="inline-flex items-center gap-2">
-            <img src="/app-logo.svg" alt="" className="h-6 w-6 rounded-md border border-white/10 bg-black/30 p-0.5" />
+            <img src={APP_LOGO} alt="" className="h-6 w-6 rounded-md border border-white/10 bg-black/30 p-0.5" />
             <div>
               <p className="text-[11px] font-semibold text-slate-200">Latest activity</p>
               <p className="text-[10px] text-slate-500">Newest {recentListRows.length} of {totalRows || '—'}</p>

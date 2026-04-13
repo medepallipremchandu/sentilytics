@@ -1,4 +1,4 @@
-# VoxIntent AI - Frontend
+# Sentilytics - Frontend
 
 A modern, animated React frontend for the Audio-Based Intent Prediction system. This application provides a stunning user interface for uploading audio files and visualizing AI-powered analysis results.
 
@@ -83,7 +83,7 @@ app.add_middleware(
 ## Project Structure
 
 ```
-voxintentai/
+sentilytics/
 ├── src/
 │   ├── components/
 │   │   ├── Header.jsx                 # App header with branding

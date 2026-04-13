@@ -11,6 +11,7 @@ import ToastContainer from './components/common/ToastContainer'
 import FeedbackAnalysisModal from './components/feedback/FeedbackAnalysisModal'
 import { apiFetch, API_URL } from './lib/api'
 import { ThemeSwitcher } from './components/ThemeSwitcher'
+import { APP_FOOTER, APP_LOGO, APP_NAME, APP_SUBTITLE } from './lib/branding'
 
 const defaultFeedbackFilters = () => ({
   search: '',
@@ -24,7 +25,6 @@ const defaultFeedbackFilters = () => ({
 })
 
 function App() {
-  const APP_NAME = 'CampusPulse Feedback Intelligence'
   const [token, setToken] = useState(localStorage.getItem('token') || '')
   const [me, setMe] = useState(null)
   const [activeTab, setActiveTab] = useState('dashboard')
@@ -86,6 +86,13 @@ function App() {
     document.addEventListener('mousedown', closeOnOutside)
     return () => document.removeEventListener('mousedown', closeOnOutside)
   }, [])
+
+  useEffect(() => {
+    if (!token || !me) {
+      setProfileOpen(false)
+      setProfileModalOpen(false)
+    }
+  }, [token, me])
 
   const loadSession = async () => {
     if (!token) {
@@ -416,6 +423,8 @@ function App() {
 
   const handleLogout = () => {
     localStorage.removeItem('token')
+    setProfileOpen(false)
+    setProfileModalOpen(false)
     setToken('')
     setMe(null)
     setDashboard(null)
@@ -598,10 +607,11 @@ function App() {
         <div className="relative z-10 mx-auto flex min-h-screen max-w-6xl flex-col px-4 py-10 sm:px-6 lg:px-8">
           <header className="mb-10 flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <img src="/app-logo.svg" alt="" className="h-11 w-11 rounded-2xl border border-white/10 bg-white/5 p-2 shadow-lg shadow-violet-500/10" />
+              <img src={APP_LOGO} alt={`${APP_NAME} logo`} className="h-11 w-11 rounded-2xl border border-white/10 bg-white/5 p-2 shadow-lg shadow-cyan-500/10" />
               <div>
-                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-violet-300/90">Campus intelligence</p>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-cyan-300/90">Campus intelligence</p>
                 <p className="text-lg font-semibold tracking-tight text-white">{APP_NAME}</p>
+                <p className="text-xs text-slate-400">{APP_SUBTITLE}</p>
               </div>
             </div>
             <div className="flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs text-slate-400">
@@ -795,7 +805,7 @@ function App() {
           </div>
 
           <footer className="mt-auto pt-12 text-center text-[11px] text-slate-600">
-            CampusPulse · Feedback intelligence for higher education
+            {APP_FOOTER}
           </footer>
         </div>
       </div>
@@ -808,7 +818,7 @@ function App() {
       <div className="mx-auto max-w-[1440px] space-y-3 sm:space-y-4">
         {/* <div className="flex flex-col gap-2 rounded-xl border border-slate-800 bg-[#101116] px-3 py-2.5 sm:flex-row sm:items-center sm:justify-between sm:px-4 sm:py-3">
           <div className="min-w-0 text-xs text-slate-300 sm:text-sm inline-flex flex-wrap items-center gap-x-2 gap-y-1">
-            <img src="/app-logo.svg" alt="CampusPulse logo" className="h-7 w-7 shrink-0 rounded-lg border border-slate-700 bg-slate-900 p-1 sm:h-8 sm:w-8" />
+            <img src={APP_LOGO} alt={`${APP_NAME} logo`} className="h-7 w-7 shrink-0 rounded-lg border border-slate-700 bg-slate-900 p-1 sm:h-8 sm:w-8" />
             <span className="font-semibold text-white">{APP_NAME}</span>
             <span className="hidden text-slate-500 sm:inline">|</span>
             <span className="min-w-0 truncate font-semibold text-white">{me.name}</span>

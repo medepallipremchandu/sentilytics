@@ -1,7 +1,8 @@
 import React from 'react'
 import { motion } from 'framer-motion'
-import { Mic2, Sparkles } from 'lucide-react'
+import { Sparkles } from 'lucide-react'
 import { ThemeSwitcher } from './ThemeSwitcher'
+import { APP_LOGO, APP_NAME, APP_SUBTITLE } from '../lib/branding'
 
 const Header = () => {
   return (
@@ -22,18 +23,16 @@ const Header = () => {
               <motion.div
                 animate={{ rotate: [0, 360], scale: [1, 1.2, 1] }}
                 transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
-                className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full blur-lg opacity-50"
+                className="absolute inset-0 rounded-full bg-gradient-to-r from-cyan-500 to-emerald-500 blur-lg opacity-50"
               />
-              <div className="relative bg-gradient-to-br from-blue-500 to-purple-600 p-3 rounded-xl">
-                <Mic2 className="w-8 h-8 text-white" />
-              </div>
+              <img src={APP_LOGO} alt={`${APP_NAME} logo`} className="relative h-14 w-14 rounded-xl border border-white/10 bg-slate-900/50 p-2" />
             </div>
             <div>
               <h1 className="text-3xl font-bold gradient-text flex items-center gap-2">
-                VoxIntent AI
+                {APP_NAME}
                 <Sparkles className="w-6 h-6 text-yellow-400 animate-pulse" />
               </h1>
-              <p className="text-sm text-gray-300">Audio Analysis Platform</p>
+              <p className="text-sm text-gray-300">{APP_SUBTITLE}</p>
             </div>
           </motion.div>
 

@@ -1,5 +1,6 @@
 import React from 'react'
 import { AlertTriangle, BarChart3, Lightbulb, ListOrdered } from 'lucide-react'
+import { APP_LOGO } from '../lib/branding'
 
 export default function AggregateInsightsSidebar({ dashboard, aggregates, recentRows = [], onNavigateToBoard }) {
   const sentimentCounts = aggregates?.sentiment_counts || {}
@@ -30,7 +31,7 @@ export default function AggregateInsightsSidebar({ dashboard, aggregates, recent
   return (
     <aside className="rounded-xl border border-white/10 bg-slate-900/90 p-3 text-slate-200 shadow-sm backdrop-blur-sm lg:sticky lg:top-3 lg:self-start">
       <div className="flex items-start gap-2.5">
-        <img src="/app-logo.svg" alt="" className="mt-0.5 h-8 w-8 shrink-0 rounded-lg border border-white/10 bg-black/30 p-1" />
+        <img src={APP_LOGO} alt="" className="mt-0.5 h-8 w-8 shrink-0 rounded-lg border border-white/10 bg-black/30 p-1" />
         <div className="min-w-0">
           <h3 className="text-sm font-semibold inline-flex items-center gap-1.5">
             <BarChart3 className="h-3.5 w-3.5 text-violet-300/90" />

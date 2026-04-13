@@ -155,8 +155,8 @@ export default function FeedbackBoard({
   }, [pagination.page_size])
 
   return (
-    <div className="space-y-4">
-      <div className="rounded-xl border border-slate-800 bg-slate-900/40 p-2 sm:p-3">
+    <div className="brand-feedback-board space-y-4">
+      <div className="fb-filter-bar rounded-xl border border-slate-800 bg-slate-900/40 p-2 sm:p-3">
         <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-stretch">
           <div className="grid min-w-0 flex-1 grid-cols-1 gap-2 sm:grid-cols-2">
             <FilterSearchBox
@@ -288,7 +288,7 @@ export default function FeedbackBoard({
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2 }}
-            className={`rounded-xl border border-slate-800 bg-slate-900/50 p-2.5 sm:p-3 ${layoutView === 'grid' ? 'flex h-full min-h-0 min-w-0 flex-col' : ''}`}
+            className={`fb-feedback-card rounded-xl border border-slate-800 bg-slate-900/50 p-2.5 sm:p-3 ${layoutView === 'grid' ? 'flex h-full min-h-0 min-w-0 flex-col' : ''}`}
           >
             <div className={`min-w-0 space-y-2 ${layoutView === 'grid' ? 'flex min-h-0 flex-1 flex-col' : ''}`}>
               <div className="flex flex-wrap items-start justify-between gap-2">

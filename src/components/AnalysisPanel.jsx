@@ -2,10 +2,8 @@ import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { AlertTriangle, CheckCircle, ChevronDown, Lightbulb, Tag, XCircle } from 'lucide-react'
 import { GLOSSARY } from '../lib/analysisGlossary'
+import { BRAND_BLUE, BRAND_GREEN } from '../lib/branding'
 import InfoTip from './common/InfoTip'
-import SentimentScoreBar from './SentimentScoreBar'
-
-const TEAL = '#20c997'
 
 const cx = (...parts) => parts.filter(Boolean).join(' ')
 
@@ -48,7 +46,12 @@ const SectionLabel = ({ children, hint }) => (
 )
 
 const InnerBox = ({ children, className = '' }) => (
-  <div className={cx('rounded-lg border border-white/10 bg-black/30 px-4 py-3 text-sm text-gray-200 leading-relaxed', className)}>
+  <div
+    className={cx(
+      'analysis-original-feedback rounded-lg border border-white/10 bg-black/30 px-4 py-3 text-sm text-gray-200 leading-relaxed max-h-[min(500px,50vh)] overflow-y-auto overscroll-contain',
+      className,
+    )}
+  >
     {children}
   </div>
 )
@@ -109,7 +112,7 @@ const InsightCard = ({ analysis, transcript, sourceLine, hasAudio, compact = fal
   const bodyPad = compact ? 'px-3 pb-4 sm:px-4' : 'px-5 pb-5'
 
   return (
-    <div className="rounded-xl border border-white/10 bg-slate-900/90 overflow-hidden">
+    <div className="analysis-brand-surface rounded-xl border border-white/10 bg-slate-900/90 overflow-hidden">
       <div
         role="button"
         tabIndex={0}
@@ -187,7 +190,7 @@ const InsightCard = ({ analysis, transcript, sourceLine, hasAudio, compact = fal
 
               {analysis.recommended_action ? (
                 <div className="rounded-lg border border-teal-500/25 bg-teal-500/5 px-4 py-3 flex gap-3">
-                  <span className="text-teal-400 text-lg leading-none mt-0.5" style={{ color: TEAL }}>
+                  <span className="text-lg leading-none mt-0.5" style={{ color: BRAND_GREEN }}>
                     →
                   </span>
                   <div>
@@ -212,7 +215,10 @@ const InsightCard = ({ analysis, transcript, sourceLine, hasAudio, compact = fal
                   <InfoTip text={GLOSSARY.howThisWasDecided} />
                 </span>
                 <span className="inline-flex items-center gap-1">
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-medium border border-teal-500/40 text-teal-300/90 bg-teal-500/10">
+                  <span
+                    className="px-2 py-0.5 rounded-full text-[10px] font-medium border bg-emerald-500/10 text-emerald-800 border-emerald-600/30"
+                    style={{ borderColor: `${BRAND_GREEN}55` }}
+                  >
                     {hasAudio ? 'Multimodal' : 'Text-only'}
                   </span>
                   <InfoTip text={hasAudio ? GLOSSARY.multimodal : GLOSSARY.textOnly} />
@@ -255,7 +261,7 @@ const SegmentInsightsBlock = ({ segment_insights, compact = false }) => {
   if (!segment_insights?.length) return null
   const headPad = compact ? 'p-3 sm:p-4' : 'p-5'
   return (
-    <div className="rounded-xl border border-white/10 bg-slate-900/90 overflow-hidden">
+    <div className="analysis-brand-surface rounded-xl border border-white/10 bg-slate-900/90 overflow-hidden">
       <div
         role="button"
         tabIndex={0}
@@ -324,7 +330,12 @@ const AnalysisPanel = ({ analysis, transcript = '', meta, hasAudio = false, comp
   const pc = compact ? 'p-3 sm:p-4' : 'p-5'
 
   return (
-    <div className={cx(compact ? 'min-w-0 max-w-none space-y-3 text-[13px] leading-snug' : 'max-w-4xl space-y-5')}>
+    <div
+      className={cx(
+        'analysis-panel',
+        compact ? 'min-w-0 max-w-none space-y-3 text-[13px] leading-snug' : 'max-w-4xl space-y-5',
+      )}
+    >
       {/* <MetricStrip analysis={analysis} /> */}
 
       {/* <div className="rounded-xl border border-white/10 bg-slate-900/90 p-5">
@@ -339,7 +350,7 @@ const AnalysisPanel = ({ analysis, transcript = '', meta, hasAudio = false, comp
         compact={compact}
       />
 
-      <div className={cx('rounded-xl border border-white/10 bg-slate-900/90', pc)}>
+      <div className={cx('analysis-brand-surface rounded-xl border border-white/10 bg-slate-900/90', pc)}>
         <SectionLabel hint={GLOSSARY.signalAndTone}>Signal & tone</SectionLabel>
         <div
           className={
@@ -389,9 +400,9 @@ const AnalysisPanel = ({ analysis, transcript = '', meta, hasAudio = false, comp
       </div>
 
       {analysis.key_phrases_detected?.length > 0 && (
-        <div className={cx('rounded-xl border border-white/10 bg-slate-900/90', pc)}>
+        <div className={cx('analysis-brand-surface rounded-xl border border-white/10 bg-slate-900/90', pc)}>
           <div className="flex items-center gap-2 mb-3">
-            <Tag className="w-5 h-5" style={{ color: TEAL }} />
+            <Tag className="w-5 h-5 shrink-0" style={{ color: BRAND_GREEN }} />
             <h3 className="font-semibold text-white flex items-center gap-1">
               Key phrases
               <InfoTip text={GLOSSARY.keyPhrases} />
@@ -401,8 +412,12 @@ const AnalysisPanel = ({ analysis, transcript = '', meta, hasAudio = false, comp
             {analysis.key_phrases_detected.map((p, i) => (
               <span
                 key={i}
-                className="px-2.5 py-1 rounded-md text-xs font-mono border border-teal-500/30 bg-teal-500/10 text-teal-200"
-                style={{ borderColor: `${TEAL}44` }}
+                className="key-phrase-pill px-2.5 py-1 rounded-md text-xs font-mono border font-medium bg-white text-slate-800 shadow-sm"
+                style={{
+                  borderColor: `${BRAND_GREEN}55`,
+                  background: `linear-gradient(180deg, #ffffff 0%, rgba(5, 146, 74, 0.08) 100%)`,
+                  color: '#064e3b',
+                }}
               >
                 &quot;{p}&quot;
               </span>
@@ -418,9 +433,9 @@ const AnalysisPanel = ({ analysis, transcript = '', meta, hasAudio = false, comp
       <ListBlock compact={compact} title="Positive statements" icon={CheckCircle} tone="green" items={analysis.positive_statements} />
 
       {analysis.key_topics?.length > 0 && (
-        <div className={cx('rounded-xl border border-white/10 bg-slate-900/90', pc)}>
+        <div className={cx('analysis-brand-surface rounded-xl border border-white/10 bg-slate-900/90', pc)}>
           <div className="flex items-center gap-2 mb-3">
-            <Tag className="w-5 h-5 text-sky-400" />
+            <Tag className="w-5 h-5 shrink-0" style={{ color: BRAND_BLUE }} />
             <h3 className="font-semibold text-white flex items-center gap-1">
               Key topics
               <InfoTip text={GLOSSARY.keyTopics} />
@@ -428,7 +443,15 @@ const AnalysisPanel = ({ analysis, transcript = '', meta, hasAudio = false, comp
           </div>
           <div className="flex flex-wrap gap-2">
             {analysis.key_topics.map((t, i) => (
-              <span key={i} className="px-3 py-1 rounded-full text-sm border border-sky-500/30 bg-sky-500/10 text-sky-200">
+              <span
+                key={i}
+                className="px-3 py-1 rounded-full text-sm border font-medium shadow-sm"
+                style={{
+                  borderColor: `${BRAND_BLUE}50`,
+                  background: `linear-gradient(180deg, #ffffff 0%, rgba(9, 112, 184, 0.1) 100%)`,
+                  color: '#0c4a6e',
+                }}
+              >
                 {t}
               </span>
             ))}

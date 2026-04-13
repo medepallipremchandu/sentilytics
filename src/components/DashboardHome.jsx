@@ -320,7 +320,7 @@ export default function DashboardHome({
 
   return (
     <motion.div
-      className="space-y-2.5"
+      className="brand-dashboard-home space-y-2.5"
       variants={containerVariants}
       initial="hidden"
       animate="show"

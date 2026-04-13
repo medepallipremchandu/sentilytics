@@ -10,8 +10,9 @@ import Modal from './components/common/Modal'
 import ToastContainer from './components/common/ToastContainer'
 import FeedbackAnalysisModal from './components/feedback/FeedbackAnalysisModal'
 import { apiFetch, API_URL } from './lib/api'
-import { ThemeSwitcher } from './components/ThemeSwitcher'
-import { APP_FOOTER, APP_LOGO, APP_NAME, APP_SUBTITLE } from './lib/branding'
+import { ThemeSwitcher, useTheme } from './components/ThemeSwitcher'
+import AppFooter from './components/AppFooter'
+import { APP_LOGO, APP_NAME, APP_SUBTITLE } from './lib/branding'
 
 const defaultFeedbackFilters = () => ({
   search: '',
@@ -25,6 +26,7 @@ const defaultFeedbackFilters = () => ({
 })
 
 function App() {
+  const { mode } = useTheme()
   const [token, setToken] = useState(localStorage.getItem('token') || '')
   const [me, setMe] = useState(null)
   const [activeTab, setActiveTab] = useState('dashboard')
@@ -588,49 +590,89 @@ function App() {
 
   if (token && isSessionLoading && !me) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#090a0e] text-white">
-        <SessionGateLoader />
+      <div className="brand-canvas flex min-h-screen flex-col bg-[#090a0e] text-white">
+        <div className="flex flex-1 items-center justify-center px-4 py-10">
+          <SessionGateLoader />
+        </div>
+        <AppFooter />
       </div>
     )
   }
 
   if (!token || !me) {
+    const loginIsLight = mode !== 'dark'
     return (
-      <div className="relative min-h-screen overflow-hidden bg-[#06060a] text-white">
-        <div className="pointer-events-none fixed inset-0">
-          <div className="absolute -left-32 top-0 h-[420px] w-[420px] rounded-full bg-violet-600/20 blur-[120px]" />
-          <div className="absolute -right-24 top-1/3 h-[380px] w-[380px] rounded-full bg-cyan-500/15 blur-[100px]" />
-          <div className="absolute bottom-0 left-1/3 h-[280px] w-[600px] -translate-x-1/2 rounded-full bg-indigo-600/10 blur-[90px]" />
-          <div className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent_0%,rgba(6,6,10,0.4)_40%,#06060a_100%)]" />
-        </div>
+      <div
+        className={`login-screen brand-canvas relative min-h-screen overflow-hidden ${loginIsLight ? 'login-screen--light text-slate-900' : 'bg-[#06060a] text-white'}`}
+      >
+        {loginIsLight ? (
+          <div className="pointer-events-none fixed inset-0">
+            <div className="absolute inset-0 bg-gradient-to-b from-emerald-50/90 via-white to-sky-50/80" />
+            <div className="absolute -left-24 top-0 h-[min(480px,55vh)] w-[min(480px,70vw)] rounded-full bg-[#05924a]/20 blur-3xl" />
+            <div className="absolute -right-24 top-1/4 h-[min(440px,50vh)] w-[min(440px,65vw)] rounded-full bg-[#0970b8]/22 blur-3xl" />
+            <div className="absolute bottom-0 left-1/2 h-40 w-[min(900px,95vw)] -translate-x-1/2 rounded-full bg-gradient-to-r from-[#05924a]/15 via-transparent to-[#0970b8]/15 blur-2xl" />
+          </div>
+        ) : (
+          <div className="pointer-events-none fixed inset-0">
+            <div className="absolute -left-32 top-0 h-[420px] w-[420px] rounded-full bg-[#0970b8]/25 blur-[120px]" />
+            <div className="absolute -right-24 top-1/3 h-[380px] w-[380px] rounded-full bg-[#05924a]/18 blur-[100px]" />
+            <div className="absolute bottom-0 left-1/3 h-[280px] w-[600px] -translate-x-1/2 rounded-full bg-[#0970b8]/12 blur-[90px]" />
+            <div className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent_0%,rgba(6,6,10,0.4)_40%,#06060a_100%)]" />
+          </div>
+        )}
 
         <div className="relative z-10 mx-auto flex min-h-screen max-w-6xl flex-col px-4 py-10 sm:px-6 lg:px-8">
           <header className="mb-10 flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <img src={APP_LOGO} alt={`${APP_NAME} logo`} className="h-11 w-11 rounded-2xl border border-white/10 bg-white/5 p-2 shadow-lg shadow-cyan-500/10" />
+              <img
+                src={APP_LOGO}
+                alt={`${APP_NAME} logo`}
+                className={`h-11 w-11 rounded-2xl border p-2 shadow-lg ${loginIsLight ? 'border-[#0970b8]/25 bg-white shadow-[#0970b8]/20]' : 'border-white/10 bg-white/5 shadow-[#0970b8]/25'}`}
+              />
               <div>
-                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-cyan-300/90">Campus intelligence</p>
-                <p className="text-lg font-semibold tracking-tight text-white">{APP_NAME}</p>
-                <p className="text-xs text-slate-400">{APP_SUBTITLE}</p>
+                <p
+                  className={`text-[11px] font-semibold uppercase tracking-[0.2em] ${loginIsLight ? 'text-[#05924a]' : 'text-white'}`}
+                >
+                  Campus intelligence
+                </p>
+                <p className={`text-lg font-semibold tracking-tight ${loginIsLight ? 'text-slate-900' : 'text-white'}`}>{APP_NAME}</p>
+                <p className={`text-xs ${loginIsLight ? 'text-slate-600' : 'text-slate-400'}`}>{APP_SUBTITLE}</p>
               </div>
             </div>
-            <div className="flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs text-slate-400">
-              <Sparkles className="h-3.5 w-3.5 text-amber-300/80" />
-              <span>Text · Audio · AI insights</span>
+            <div className="flex flex-wrap items-center justify-end gap-3">
+              <ThemeSwitcher />
+              <div
+                className={`flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs ${loginIsLight ? 'border-[#0970b8]/25 bg-white/90 text-slate-600 shadow-sm' : 'border-white/10 bg-white/[0.04] text-slate-400'}`}
+              >
+                <Sparkles className="h-3.5 w-3.5 text-[#05924a]" />
+                <span>Text · Audio · AI insights</span>
+              </div>
             </div>
           </header>
 
           <div className="grid flex-1 gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:items-stretch lg:gap-10">
-            <section className="flex flex-col justify-center rounded-3xl border border-white/[0.08] bg-slate-900/90 p-8 shadow-[0_24px_80px_-24px_rgba(0,0,0,0.85)] backdrop-blur-sm sm:p-10">
-              <div className="mb-6 inline-flex w-fit items-center gap-2 rounded-full border border-violet-400/25 bg-violet-500/10 px-3 py-1 text-xs font-medium text-violet-200">
+            <section
+              className={`flex flex-col justify-center rounded-3xl border p-8 backdrop-blur-sm sm:p-10 ${
+                loginIsLight
+                  ? 'border-[#0970b8]/25 bg-white/95 shadow-[0_24px_80px_-28px_rgba(9,112,184,0.25)]'
+                  : 'border-white/[0.08] bg-slate-900/90 shadow-[0_24px_80px_-24px_rgba(0,0,0,0.85)]'
+              }`}
+            >
+              <div
+                className={`mb-6 inline-flex w-fit items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium ${
+                  loginIsLight
+                    ? 'border-[#0970b8]/40 bg-gradient-to-r from-[#0970b8]/12 to-[#05924a]/10 text-[#0c4a6e]'
+                    : 'border-[#0970b8]/35 bg-[#0970b8]/15 text-white'
+                }`}
+              >
                 <Compass className="h-3.5 w-3.5" />
                 Welcome
               </div>
               <h1 className="text-3xl font-bold leading-tight tracking-tight sm:text-4xl md:text-[2.35rem]">
                 <span className="gradient-text">Listen smarter.</span>
-                <span className="block text-slate-100">Act faster on campus feedback.</span>
+                <span className={`block ${loginIsLight ? 'text-slate-800' : 'text-slate-100'}`}>Act faster on campus feedback.</span>
               </h1>
-              <p className="mt-4 max-w-xl text-base leading-relaxed text-slate-400">
+              <p className={`mt-4 max-w-xl text-base leading-relaxed ${loginIsLight ? 'text-slate-600' : 'text-slate-400'}`}>
                 Capture student voice from text and audio, analyze sentiment and intent, and turn signals into clear next steps for academic quality.
               </p>
 
@@ -640,17 +682,28 @@ function App() {
                   { icon: Mic, label: 'Voice & text', sub: 'Whisper + analysis' },
                   { icon: Shield, label: 'Role-based access', sub: 'Secure by design' },
                 ].map(({ icon: Icon, label, sub }) => (
-                  <li key={label} className="rounded-2xl border border-white/[0.06] bg-white/[0.03] px-4 py-3">
-                    <Icon className="mb-2 h-5 w-5 text-violet-300/90" />
-                    <p className="text-sm font-medium text-slate-200">{label}</p>
-                    <p className="text-[11px] text-slate-500">{sub}</p>
+                  <li
+                    key={label}
+                    className={`rounded-2xl border px-4 py-3 ${
+                      loginIsLight
+                        ? 'border-[#05924a]/20 bg-gradient-to-br from-white to-emerald-50/50 shadow-sm'
+                        : 'border-white/[0.06] bg-white/[0.03]'
+                    }`}
+                  >
+                    <Icon className={`mb-2 h-5 w-5 ${loginIsLight ? 'text-[#0970b8]' : 'text-white'}`} />
+                    <p className={`text-sm font-medium ${loginIsLight ? 'text-slate-800' : 'text-slate-200'}`}>{label}</p>
+                    <p className={`text-[11px] ${loginIsLight ? 'text-slate-600' : 'text-slate-500'}`}>{sub}</p>
                   </li>
                 ))}
               </ul>
 
-              <div className="mt-10 rounded-2xl border border-white/10 bg-slate-900/30 p-6">
-                <h2 className="text-lg font-semibold text-white">Choose how to continue</h2>
-                <p className="mt-1 text-sm text-slate-400">
+              <div
+                className={`mt-10 rounded-2xl border p-6 ${
+                  loginIsLight ? 'border-slate-200/90 bg-slate-50/90 shadow-inner' : 'border-white/10 bg-slate-900/30'
+                }`}
+              >
+                <h2 className={`text-lg font-semibold ${loginIsLight ? 'text-slate-900' : 'text-white'}`}>Choose how to continue</h2>
+                <p className={`mt-1 text-sm ${loginIsLight ? 'text-slate-600' : 'text-slate-400'}`}>
                   Sign in for dashboards and admin tools, or share feedback anonymously—no account required.
                 </p>
                 <div className="mt-5 flex flex-col gap-3 sm:flex-row">
@@ -659,8 +712,12 @@ function App() {
                     onClick={() => setAuthScreen('login')}
                     className={`group flex flex-1 items-center justify-center gap-2 rounded-xl border px-4 py-3.5 text-sm font-semibold transition-all ${
                       authScreen === 'login'
-                        ? 'border-violet-400/50 bg-violet-500/20 text-white shadow-lg shadow-violet-500/15'
-                        : 'border-slate-600/50 bg-slate-900/50 text-slate-300 hover:border-violet-500/40 hover:bg-violet-500/10'
+                        ? loginIsLight
+                          ? 'border-[#0970b8] bg-[#0970b8] text-white shadow-lg shadow-[#0970b8]/25'
+                          : 'border-[#0970b8]/55 bg-[#0970b8]/20 text-white shadow-lg shadow-[#0970b8]/20'
+                        : loginIsLight
+                          ? 'border-slate-200 bg-white text-slate-700 hover:border-[#0970b8]/45 hover:bg-sky-50'
+                          : 'border-slate-600/50 bg-slate-900/50 text-slate-300 hover:border-[#0970b8]/45 hover:bg-[#0970b8]/10'
                     }`}
                   >
                     <UserCircle2 className="h-4 w-4 opacity-80" />
@@ -672,8 +729,12 @@ function App() {
                     onClick={() => setAuthScreen('guest')}
                     className={`group flex flex-1 items-center justify-center gap-2 rounded-xl border px-4 py-3.5 text-sm font-semibold transition-all ${
                       authScreen === 'guest'
-                        ? 'border-cyan-400/45 bg-cyan-500/15 text-cyan-50 shadow-lg shadow-cyan-500/10'
-                        : 'border-slate-600/50 bg-slate-900/50 text-slate-300 hover:border-cyan-500/35 hover:bg-cyan-500/10'
+                        ? loginIsLight
+                          ? 'border-[#05924a] bg-[#05924a] text-white shadow-lg shadow-[#05924a]/20'
+                          : 'border-[#05924a]/50 bg-[#05924a]/18 text-white shadow-lg shadow-[#05924a]/15'
+                        : loginIsLight
+                          ? 'border-slate-200 bg-white text-slate-700 hover:border-[#05924a]/45 hover:bg-emerald-50'
+                          : 'border-slate-600/50 bg-slate-900/50 text-slate-300 hover:border-[#05924a]/40 hover:bg-[#05924a]/10'
                     }`}
                   >
                     <Send className="h-4 w-4 opacity-80" />
@@ -686,8 +747,18 @@ function App() {
 
             <aside className="flex min-h-[420px] flex-col lg:min-h-0">
               {authScreen === 'guest' ? (
-                  <div className="h-full rounded-3xl border border-white/[0.08] bg-slate-900/90 p-1 shadow-[0_24px_60px_-20px_rgba(0,0,0,0.75)] backdrop-blur-sm">
-                  <div className="h-full rounded-[1.35rem] border border-white/[0.05] bg-slate-900/70 p-5 sm:p-6">
+                  <div
+                    className={`h-full rounded-3xl border p-1 backdrop-blur-sm ${
+                      loginIsLight
+                        ? 'border-[#05924a]/30 bg-white/95 shadow-[0_24px_60px_-24px_rgba(5,146,74,0.18)]'
+                        : 'border-white/[0.08] bg-slate-900/90 shadow-[0_24px_60px_-20px_rgba(0,0,0,0.75)]'
+                    }`}
+                  >
+                  <div
+                    className={`h-full rounded-[1.35rem] border p-5 sm:p-6 ${
+                      loginIsLight ? 'border-emerald-100/80 bg-gradient-to-b from-white to-emerald-50/30' : 'border-white/[0.05] bg-slate-900/70'
+                    }`}
+                  >
                     <SubmitPanel
                       mode={submitMode}
                       setMode={setSubmitMode}
@@ -713,7 +784,11 @@ function App() {
                   layout
                   onSubmit={handleLogin}
                   aria-busy={isLoginSubmitting}
-                  className="relative flex h-full flex-col overflow-hidden rounded-3xl border border-white/[0.08] bg-slate-900/90 p-8 shadow-[0_24px_60px_-20px_rgba(0,0,0,0.75)]"
+                  className={`relative flex h-full flex-col overflow-hidden rounded-3xl border p-8 ${
+                    loginIsLight
+                      ? 'border-[#0970b8]/25 bg-white/95 shadow-[0_24px_60px_-28px_rgba(9,112,184,0.2)]'
+                      : 'border-white/[0.08] bg-slate-900/90 shadow-[0_24px_60px_-20px_rgba(0,0,0,0.75)]'
+                  }`}
                 >
                   <motion.div
                     animate={{ opacity: isLoginSubmitting ? 0.88 : 1 }}
@@ -721,15 +796,29 @@ function App() {
                     className="flex min-h-0 flex-1 flex-col"
                   >
                     <div className="mb-6">
-                      <p className="text-xs font-semibold uppercase tracking-wider text-violet-300/80">Secure access</p>
-                      <h2 className="mt-1 text-2xl font-bold text-white">Sign in</h2>
-                      <p className="mt-2 text-sm text-slate-400">Use your campus credentials to open dashboards and admin tools.</p>
+                      <p
+                        className={`text-xs font-semibold uppercase tracking-wider ${loginIsLight ? 'text-[#0970b8]' : 'text-white'}`}
+                      >
+                        Secure access
+                      </p>
+                      <h2 className={`mt-1 text-2xl font-bold ${loginIsLight ? 'text-slate-900' : 'text-white'}`}>Sign in</h2>
+                      <p className={`mt-2 text-sm ${loginIsLight ? 'text-slate-600' : 'text-slate-400'}`}>
+                        Use your campus credentials to open dashboards and admin tools.
+                      </p>
                     </div>
                     <div className="space-y-4">
                       <div>
-                        <label className="mb-1.5 block text-xs font-medium text-slate-400">Email</label>
+                        <label
+                          className={`mb-1.5 block text-xs font-medium ${loginIsLight ? 'text-slate-700' : 'text-slate-400'}`}
+                        >
+                          Email
+                        </label>
                         <input
-                          className="w-full rounded-xl border border-slate-700/80 bg-slate-950/80 px-4 py-3 text-slate-100 outline-none ring-violet-500/30 placeholder:text-slate-600 focus:border-violet-500/50 focus:ring-2 disabled:cursor-not-allowed disabled:opacity-60"
+                          className={`w-full rounded-xl border px-4 py-3 outline-none focus:ring-2 disabled:cursor-not-allowed disabled:opacity-60 ${
+                            loginIsLight
+                              ? 'border-slate-200 bg-white text-slate-900 shadow-sm ring-[#0970b8]/20 placeholder:text-slate-400 focus:border-[#0970b8] focus:ring-[#0970b8]/25'
+                              : 'border-slate-700/80 bg-slate-950/80 text-slate-100 ring-[#0970b8]/30 placeholder:text-slate-600 focus:border-[#0970b8]/55'
+                          }`}
                           placeholder="you@university.edu"
                           value={loginForm.email}
                           disabled={isLoginSubmitting}
@@ -738,9 +827,17 @@ function App() {
                         />
                       </div>
                       <div>
-                        <label className="mb-1.5 block text-xs font-medium text-slate-400">Password</label>
+                        <label
+                          className={`mb-1.5 block text-xs font-medium ${loginIsLight ? 'text-slate-700' : 'text-slate-400'}`}
+                        >
+                          Password
+                        </label>
                         <input
-                          className="w-full rounded-xl border border-slate-700/80 bg-slate-950/80 px-4 py-3 text-slate-100 outline-none ring-violet-500/30 placeholder:text-slate-600 focus:border-violet-500/50 focus:ring-2 disabled:cursor-not-allowed disabled:opacity-60"
+                          className={`w-full rounded-xl border px-4 py-3 outline-none focus:ring-2 disabled:cursor-not-allowed disabled:opacity-60 ${
+                            loginIsLight
+                              ? 'border-slate-200 bg-white text-slate-900 shadow-sm ring-[#0970b8]/20 placeholder:text-slate-400 focus:border-[#0970b8] focus:ring-[#0970b8]/25'
+                              : 'border-slate-700/80 bg-slate-950/80 text-slate-100 ring-[#0970b8]/30 placeholder:text-slate-600 focus:border-[#0970b8]/55'
+                          }`}
                           placeholder="••••••••"
                           type="password"
                           value={loginForm.password}
@@ -749,12 +846,12 @@ function App() {
                           onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
                         />
                       </div>
-                      {error && <p className="text-sm text-red-400">{error}</p>}
+                      {error && <p className="text-sm text-red-500">{error}</p>}
                     </div>
                     <button
                       type="submit"
                       disabled={isLoginSubmitting}
-                      className="group relative mt-8 w-full overflow-hidden rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 py-3.5 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 transition hover:from-violet-500 hover:to-indigo-500 disabled:cursor-wait disabled:hover:from-violet-600 disabled:hover:to-indigo-600"
+                      className="group relative mt-8 w-full overflow-hidden rounded-xl bg-gradient-to-r from-[#0970b8] to-[#05924a] py-3.5 text-sm font-semibold text-white shadow-lg shadow-[#0970b8]/25 transition hover:brightness-110 disabled:cursor-wait disabled:hover:brightness-100"
                     >
                       <span className="relative inline-flex items-center justify-center gap-2">
                         {isLoginSubmitting ? (
@@ -779,9 +876,9 @@ function App() {
                           transition={{ duration: 0.2 }}
                           className="overflow-hidden"
                         >
-                          <p className="mt-3 text-center text-xs text-slate-500">
+                          <p className={`mt-3 text-center text-xs ${loginIsLight ? 'text-slate-500' : 'text-slate-500'}`}>
                             <span className="inline-flex items-center gap-2">
-                              <span className="inline-flex h-1.5 w-1.5 animate-pulse rounded-full bg-violet-400" />
+                              <span className="inline-flex h-1.5 w-1.5 animate-pulse rounded-full bg-[#0970b8]" />
                               Verifying credentials and loading your workspace…
                             </span>
                           </p>
@@ -791,31 +888,37 @@ function App() {
                   </motion.div>
                 </motion.form>
               ) : (
-                <div className="flex h-full flex-col items-center justify-center rounded-3xl border border-dashed border-white/15 bg-white/[0.02] px-8 py-16 text-center">
-                  <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl border border-white/10 bg-gradient-to-br from-violet-500/20 to-cyan-500/10">
-                    <Compass className="h-8 w-8 text-violet-200/90" />
+                <div
+                  className={`flex h-full flex-col items-center justify-center rounded-3xl border border-dashed px-8 py-16 text-center ${
+                    loginIsLight
+                      ? 'border-[#0970b8]/30 bg-white/80 shadow-[0_20px_50px_-24px_rgba(9,112,184,0.15)]'
+                      : 'border-white/15 bg-white/[0.02]'
+                  }`}
+                >
+                  <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl border border-[#0970b8]/20 bg-gradient-to-br from-[#0970b8]/20 to-[#05924a]/15">
+                    <Compass className={`h-8 w-8 ${loginIsLight ? 'text-[#0970b8]' : 'text-white'}`} />
                   </div>
-                  <p className="text-lg font-semibold text-slate-200">Pick a path to begin</p>
-                  <p className="mt-2 max-w-xs text-sm leading-relaxed text-slate-500">
-                    Use <span className="text-slate-400">Sign in</span> for your account, or <span className="text-slate-400">Anonymous feedback</span> to submit without logging in.
+                  <p className={`text-lg font-semibold ${loginIsLight ? 'text-slate-800' : 'text-slate-200'}`}>Pick a path to begin</p>
+                  <p className={`mt-2 max-w-xs text-sm leading-relaxed ${loginIsLight ? 'text-slate-600' : 'text-slate-500'}`}>
+                    Use <span className={loginIsLight ? 'font-medium text-[#0970b8]' : 'text-slate-400'}>Sign in</span> for your account, or{' '}
+                    <span className={loginIsLight ? 'font-medium text-[#05924a]' : 'text-slate-400'}>Anonymous feedback</span> to submit without logging in.
                   </p>
                 </div>
               )}
             </aside>
           </div>
 
-          <footer className="mt-auto pt-12 text-center text-[11px] text-slate-600">
-            {APP_FOOTER}
-          </footer>
+          <AppFooter />
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-[#090a0e] text-white p-3 sm:p-4 md:p-6">
-      <ToastContainer toasts={toasts} onDismiss={dismissToast} />
-      <div className="mx-auto max-w-[1440px] space-y-3 sm:space-y-4">
+    <div className="brand-canvas flex min-h-screen flex-col bg-[#090a0e] text-white">
+      <div className="flex flex-1 flex-col p-3 sm:p-4 md:p-6">
+        <ToastContainer toasts={toasts} onDismiss={dismissToast} />
+        <div className="mx-auto w-full max-w-[1440px] flex-1 space-y-3 sm:space-y-4">
         {/* <div className="flex flex-col gap-2 rounded-xl border border-slate-800 bg-[#101116] px-3 py-2.5 sm:flex-row sm:items-center sm:justify-between sm:px-4 sm:py-3">
           <div className="min-w-0 text-xs text-slate-300 sm:text-sm inline-flex flex-wrap items-center gap-x-2 gap-y-1">
             <img src={APP_LOGO} alt={`${APP_NAME} logo`} className="h-7 w-7 shrink-0 rounded-lg border border-slate-700 bg-slate-900 p-1 sm:h-8 sm:w-8" />
@@ -828,15 +931,15 @@ function App() {
           </div>
         </div> */}
 
-        <div className="flex flex-col gap-3 border-b border-slate-800 pb-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="brand-top-bar flex flex-col gap-3 border-b border-slate-800 pb-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="w-full min-w-0 overflow-x-auto [-webkit-overflow-scrolling:touch] pb-0.5 sm:overflow-visible sm:pb-0">
-            <div className="flex w-max gap-2 sm:flex-wrap sm:w-auto">
+            <div className="brand-tab-list flex w-max gap-2 sm:flex-wrap sm:w-auto">
               {visibleTabs.map((tab) => (
                 <button
                   key={tab}
                   type="button"
                   onClick={() => handleTabNavigate(tab)}
-                  className={`shrink-0 rounded-lg border px-2.5 py-1.5 text-xs sm:px-3 sm:text-sm ${activeTab === tab ? 'border-amber-400/40 bg-amber-500/10 text-amber-200' : 'border-slate-700 bg-[#14151b] text-slate-300'}`}
+                  className={`brand-nav-tab shrink-0 rounded-lg border px-2.5 py-1.5 text-xs transition sm:px-3 sm:text-sm ${activeTab === tab ? 'border-amber-400/40 bg-amber-500/10 text-amber-200' : 'border-slate-700 bg-[#14151b] text-slate-300'}`}
                 >
                   <span className="inline-flex items-center gap-1.5 sm:gap-2">
                     {tabMeta[tab]?.icon ? React.createElement(tabMeta[tab].icon, { className: 'h-3.5 w-3.5 sm:h-4 sm:w-4' }) : null}
@@ -882,13 +985,13 @@ function App() {
 
         <div className="grid gap-4 lg:grid-cols-[minmax(0,320px)_1fr]">
           {isDashboardAggregatesLoading && !dashboardAggregates ? (
-            <div className="rounded-2xl border border-slate-800 bg-[#101116] p-6 min-h-[260px]">
+            <div className="brand-panel-sidebar rounded-2xl border border-slate-800 bg-[#101116] p-6 min-h-[260px]">
               <PageLoader label="Loading aggregate insights..." />
             </div>
           ) : (
             <AggregateInsightsSidebar dashboard={dashboard} aggregates={dashboardAggregates} recentRows={recentRows} onNavigateToBoard={goToFeedbackBoard} />
           )}
-          <div>
+          <div className="brand-panel-main min-w-0 rounded-xl p-1 sm:p-2 lg:min-h-0">
             {activeTab === 'dashboard' && (
               isDashboardLoading && !dashboard ? (
                 <div className="rounded-2xl border border-slate-800 bg-[#101116] p-6 min-h-[300px]">
@@ -992,7 +1095,9 @@ function App() {
             )}
           </div>
         </div>
+        </div>
       </div>
+      <AppFooter />
       <FeedbackAnalysisModal
         open={!!analysisModalRow}
         row={analysisModalRow}

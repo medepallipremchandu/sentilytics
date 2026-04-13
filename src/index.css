@@ -17,15 +17,18 @@
   --theme-text: #f8fafc;
 }
 
+/* Used with .theme-light on <html>; surfaces stay light, accents use logo colors */
 :root.theme-brand {
-  --theme-bg: #071520;
-  --theme-text: #eaffff;
-  --brand-surface-1: #0b2232;
-  --brand-surface-2: #113046;
-  --brand-surface-3: #17405a;
-  --brand-border: rgba(34, 211, 238, 0.32);
-  --brand-border-strong: rgba(16, 185, 129, 0.55);
-  --brand-text-soft: #b7d7e3;
+  --brand-blue: #0970b8;
+  --brand-green: #05924a;
+  --brand-surface-1: #ffffff;
+  --brand-surface-2: #f8fafc;
+  --brand-surface-3: #f1f5f9;
+  --brand-elevated: rgba(9, 112, 184, 0.08);
+  --brand-border: rgba(15, 23, 42, 0.1);
+  --brand-border-accent: rgba(9, 112, 184, 0.22);
+  --brand-border-strong: rgba(9, 112, 184, 0.5);
+  --brand-text-soft: #64748b;
 }
 
 :root.theme-light {
@@ -48,7 +51,7 @@
   }
   
   .glow-effect {
-    box-shadow: 0 0 20px rgba(6, 182, 212, 0.45);
+    box-shadow: 0 0 20px rgba(9, 112, 184, 0.4);
   }
   
   .animate-gradient-x {
@@ -73,6 +76,18 @@
 
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(139, 92, 246, 0.7);
+}
+
+:root.theme-brand ::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #0970b8, #05924a);
+}
+
+:root.theme-brand ::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #0970b8, #05924a);
+}
+
+:root.theme-brand ::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.06);
 }
 
 /* Light mode utility remaps for existing dark classes */
@@ -219,142 +234,457 @@
   background-color: #ffffff !important;
 }
 
-/* Profile menu: Tailwind hover:bg-slate-800 is not remapped for :hover — was dark-on-dark in light mode */
-:root.theme-light .profile-menu {
+/* Profile menu + theme dropdown: Tailwind hover:bg-slate-800 is not remapped for :hover — was dark-on-dark in light mode */
+:root.theme-light .profile-menu,
+:root.theme-light .theme-switcher-menu {
   background-color: #ffffff !important;
   border-color: #cbd5e1 !important;
 }
 
-:root.theme-light .profile-menu button {
+:root.theme-light .profile-menu button,
+:root.theme-light .theme-switcher-menu button {
   color: #0f172a !important;
 }
 
-:root.theme-light .profile-menu button:hover {
+:root.theme-light .profile-menu button:hover,
+:root.theme-light .theme-switcher-menu button:hover {
   background-color: #e2e8f0 !important;
   color: #0f172a !important;
 }
 
-/* Brand mode accent remaps (green/blue palette). */
+:root.theme-light .theme-switcher-menu button[aria-selected='true'] {
+  background-color: rgba(5, 146, 74, 0.12) !important;
+  color: #0f172a !important;
+}
+
+/* Keep trigger chrome only — inner gradient (green→blue) must stay visible */
+:root.theme-light .theme-switcher-trigger {
+  border-color: rgba(9, 112, 184, 0.35) !important;
+  background-color: transparent !important;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08) !important;
+}
+
+:root.theme-light .theme-switcher-trigger:hover {
+  background-color: transparent !important;
+  filter: brightness(1.05);
+}
+
+/* Brand mode (with .theme-light): accent remaps — blue for violet, green for amber */
 :root.theme-brand .text-violet-300,
 :root.theme-brand .text-violet-300\/90,
 :root.theme-brand .text-violet-400,
 :root.theme-brand .text-violet-400\/90 {
-  color: #22d3ee !important;
+  color: #0970b8 !important;
 }
 
 :root.theme-brand .text-amber-200,
 :root.theme-brand .text-amber-300,
 :root.theme-brand .text-amber-300\/80 {
-  color: #6ee7b7 !important;
+  color: #05924a !important;
 }
 
 :root.theme-brand .bg-violet-500\/10,
 :root.theme-brand .bg-violet-500\/20 {
-  background-color: rgba(34, 211, 238, 0.14) !important;
+  background-color: rgba(9, 112, 184, 0.14) !important;
 }
 
 :root.theme-brand .border-violet-400\/40,
 :root.theme-brand .border-violet-400\/50 {
-  border-color: rgba(34, 211, 238, 0.45) !important;
+  border-color: rgba(9, 112, 184, 0.45) !important;
 }
 
 :root.theme-brand .bg-amber-500\/10,
 :root.theme-brand .bg-amber-500\/15 {
-  background-color: rgba(16, 185, 129, 0.14) !important;
+  background-color: rgba(5, 146, 74, 0.12) !important;
 }
 
 :root.theme-brand .border-amber-400\/25,
 :root.theme-brand .border-amber-400\/40 {
-  border-color: rgba(16, 185, 129, 0.45) !important;
-}
-
-/* Full UI recolor for brand mode so screens don't stay dark-only. */
-:root.theme-brand body {
-  background:
-    radial-gradient(1100px 480px at 12% -5%, rgba(6, 182, 212, 0.34), transparent 60%),
-    radial-gradient(900px 420px at 90% 8%, rgba(16, 185, 129, 0.28), transparent 58%),
-    linear-gradient(180deg, #082031 0%, #061420 100%) !important;
-}
-
-:root.theme-brand .bg-\[\#06060a\],
-:root.theme-brand .bg-\[\#090a0e\],
-:root.theme-brand .bg-\[\#101116\],
-:root.theme-brand .bg-\[\#111218\],
-:root.theme-brand .bg-\[\#12131a\],
-:root.theme-brand .bg-\[\#14151b\],
-:root.theme-brand .bg-\[\#191a20\],
-:root.theme-brand .bg-\[\#1a1b22\],
-:root.theme-brand .bg-slate-950 {
-  background-color: var(--brand-surface-1) !important;
-}
-
-:root.theme-brand .bg-slate-900,
-:root.theme-brand .bg-slate-900\/90 {
-  background-color: var(--brand-surface-2) !important;
-}
-
-:root.theme-brand .bg-slate-900\/70,
-:root.theme-brand .bg-slate-900\/50,
-:root.theme-brand .bg-slate-900\/40,
-:root.theme-brand .bg-slate-900\/30,
-:root.theme-brand .bg-slate-800 {
-  background-color: var(--brand-surface-3) !important;
-}
-
-:root.theme-brand .bg-black\/30,
-:root.theme-brand .bg-black\/60,
-:root.theme-brand .bg-white\/5,
-:root.theme-brand .bg-white\/10,
-:root.theme-brand .bg-white\/15 {
-  background-color: rgba(8, 31, 46, 0.68) !important;
-}
-
-:root.theme-brand .border-slate-900,
-:root.theme-brand .border-slate-800,
-:root.theme-brand .border-slate-700,
-:root.theme-brand .border-white\/10,
-:root.theme-brand .border-white\/20 {
-  border-color: var(--brand-border) !important;
-}
-
-:root.theme-brand .text-slate-500,
-:root.theme-brand .text-slate-400,
-:root.theme-brand .text-gray-500,
-:root.theme-brand .text-gray-400 {
-  color: var(--brand-text-soft) !important;
-}
-
-:root.theme-brand .text-slate-300,
-:root.theme-brand .text-slate-200,
-:root.theme-brand .text-gray-300,
-:root.theme-brand .text-gray-200,
-:root.theme-brand .text-white {
-  color: #e2fbff !important;
+  border-color: rgba(5, 146, 74, 0.4) !important;
 }
 
 :root.theme-brand .hover\:bg-slate-800:hover,
 :root.theme-brand .hover\:bg-slate-700:hover {
-  background-color: #143247 !important;
+  background-color: rgba(9, 112, 184, 0.08) !important;
 }
 
 :root.theme-brand .hover\:border-violet-500\/40:hover,
 :root.theme-brand .hover\:border-cyan-500\/35:hover,
 :root.theme-brand .focus-visible\:ring-amber-400\/40:focus-visible {
   border-color: var(--brand-border-strong) !important;
-  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2) !important;
+  box-shadow: 0 0 0 2px rgba(5, 146, 74, 0.22) !important;
 }
 
 :root.theme-brand .bg-gradient-to-r.from-violet-600.to-indigo-600,
 :root.theme-brand .bg-gradient-to-r.from-violet-500.to-indigo-500 {
-  background-image: linear-gradient(to right, #0891b2, #10b981) !important;
+  background-image: linear-gradient(to right, #0970b8, #05924a) !important;
 }
 
 :root.theme-brand .from-violet-600,
 :root.theme-brand .from-violet-500 {
-  --tw-gradient-from: #0891b2 var(--tw-gradient-from-position) !important;
+  --tw-gradient-from: #0970b8 var(--tw-gradient-from-position) !important;
 }
 
 :root.theme-brand .to-indigo-600,
 :root.theme-brand .to-indigo-500 {
-  --tw-gradient-to: #10b981 var(--tw-gradient-to-position) !important;
+  --tw-gradient-to: #05924a var(--tw-gradient-to-position) !important;
+}
+
+/* Brand: headline gradient text */
+:root.theme-brand .gradient-text {
+  background-image: linear-gradient(90deg, #0970b8, #0970b8, #05924a) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+}
+
+/* Brand: primary nav tab — green accent, readable on white */
+:root.theme-brand .border-amber-400\/40.bg-amber-500\/10.text-amber-200 {
+  border-color: rgba(5, 146, 74, 0.45) !important;
+  background-color: rgba(5, 146, 74, 0.1) !important;
+  color: #0f172a !important;
+}
+
+/*
+ * Main nav tab strip (Admin, Dashboard, …): same outer frame in every theme.
+ * Light + Brand use a neutral slate border so Brand isn’t the only “boxed” look.
+ */
+:root.theme-light:not(.theme-brand) .brand-tab-list {
+  padding: 0.35rem 0.45rem;
+  border-radius: 0.75rem;
+  background: rgba(241, 245, 249, 0.95) !important;
+  border: 1px solid rgba(148, 163, 184, 0.45) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
+}
+
+:root.theme-brand .brand-tab-list {
+  padding: 0.35rem 0.45rem;
+  border-radius: 0.75rem;
+  background:
+    linear-gradient(120deg, rgba(5, 146, 74, 0.14) 0%, rgba(255, 255, 255, 0.72) 45%, rgba(9, 112, 184, 0.14) 100%) !important;
+  border: 1px solid rgba(148, 163, 184, 0.45) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.88) !important;
+}
+
+:root.theme-dark .brand-tab-list {
+  padding: 0.35rem 0.45rem;
+  border-radius: 0.75rem;
+  background: rgba(15, 23, 42, 0.72) !important;
+  border: 1px solid rgba(51, 65, 85, 0.9) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 1px 3px rgba(0, 0, 0, 0.35) !important;
+}
+
+/* Inactive tabs: alternate green-leaning vs blue-leaning for contrast */
+:root.theme-brand .brand-top-bar button.brand-nav-tab:nth-child(odd):not(.border-amber-400\/40) {
+  border-width: 1px !important;
+  border-color: rgba(5, 146, 74, 0.5) !important;
+  background:
+    linear-gradient(180deg, #ffffff 0%, rgba(5, 146, 74, 0.14) 100%) !important;
+  color: #065f46 !important;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.95) inset,
+    0 1px 4px rgba(5, 146, 74, 0.15) !important;
+}
+
+:root.theme-brand .brand-top-bar button.brand-nav-tab:nth-child(even):not(.border-amber-400\/40) {
+  border-width: 1px !important;
+  border-color: rgba(9, 112, 184, 0.48) !important;
+  background:
+    linear-gradient(180deg, #ffffff 0%, rgba(9, 112, 184, 0.12) 100%) !important;
+  color: #0c4a6e !important;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.95) inset,
+    0 1px 4px rgba(9, 112, 184, 0.14) !important;
+}
+
+:root.theme-brand .brand-top-bar button.brand-nav-tab:hover {
+  filter: brightness(0.98) !important;
+  border-color: rgba(5, 146, 74, 0.55) !important;
+  background:
+    linear-gradient(180deg, #ffffff 0%, rgba(5, 146, 74, 0.18) 45%, rgba(9, 112, 184, 0.14) 100%) !important;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.95) inset,
+    0 3px 10px rgba(9, 112, 184, 0.12) !important;
+}
+
+:root.theme-brand .brand-top-bar button.brand-nav-tab.border-amber-400\/40 {
+  border-color: rgba(9, 112, 184, 0.55) !important;
+  background:
+    linear-gradient(145deg, rgba(5, 146, 74, 0.32) 0%, rgba(9, 112, 184, 0.28) 100%) !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  text-shadow: 0 1px 1px rgba(15, 23, 42, 0.2) !important;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.25) inset,
+    0 3px 14px rgba(5, 146, 74, 0.25),
+    0 2px 10px rgba(9, 112, 184, 0.2) !important;
+}
+
+:root.theme-brand .brand-top-bar button.brand-nav-tab.border-amber-400\/40,
+:root.theme-brand .brand-top-bar button.brand-nav-tab.border-amber-400\/40 * {
+  color: #ffffff !important;
+}
+
+/* Top bar: blue → green underline */
+:root.theme-brand .brand-top-bar {
+  position: relative;
+  border-bottom-color: transparent !important;
+}
+:root.theme-brand .brand-top-bar::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #05924a, #0970b8);
+  pointer-events: none;
+}
+
+/* Full-width brand canvas: bold green ← → blue with light center + darker edge tints */
+:root.theme-brand body {
+  background-color: #e8f5f0 !important;
+  background-image:
+    radial-gradient(ellipse 90% 70% at 0% 50%, rgba(5, 146, 74, 0.45), transparent 58%),
+    radial-gradient(ellipse 90% 70% at 100% 50%, rgba(9, 112, 184, 0.42), transparent 58%),
+    linear-gradient(
+      90deg,
+      #a7f3d0 0%,
+      #d1fae5 12%,
+      #ffffff 48%,
+      #e0f2fe 88%,
+      #93c5fd 100%
+    ) !important;
+  background-attachment: fixed !important;
+}
+
+:root.theme-brand .brand-canvas,
+:root.theme-brand .bg-\[\#090a0e\],
+:root.theme-brand .bg-\[\#06060a\] {
+  background-color: transparent !important;
+  background-image:
+    radial-gradient(ellipse 85% 65% at 0% 45%, rgba(5, 146, 74, 0.38), transparent 55%),
+    radial-gradient(ellipse 85% 65% at 100% 55%, rgba(9, 112, 184, 0.36), transparent 55%),
+    linear-gradient(
+      90deg,
+      rgba(5, 146, 74, 0.18) 0%,
+      #ecfdf5 15%,
+      #ffffff 50%,
+      #f0f9ff 85%,
+      rgba(9, 112, 184, 0.2) 100%
+    ) !important;
+}
+
+:root.theme-brand .brand-panel-sidebar {
+  position: relative;
+  background:
+    linear-gradient(160deg, rgba(5, 146, 74, 0.18) 0%, #ffffff 38%, rgba(15, 23, 42, 0.04) 100%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.95) 0%, rgba(9, 112, 184, 0.1) 100%) !important;
+  border: 1px solid rgba(9, 112, 184, 0.35) !important;
+  box-shadow:
+    inset 5px 0 0 0 #05924a,
+    inset 0 -1px 0 rgba(9, 112, 184, 0.12),
+    0 0 0 1px rgba(5, 146, 74, 0.15),
+    0 14px 44px -12px rgba(9, 112, 184, 0.22),
+    0 10px 36px -16px rgba(5, 146, 74, 0.14) !important;
+}
+
+:root.theme-brand .brand-panel-main {
+  position: relative;
+  border: 1px solid rgba(9, 112, 184, 0.32) !important;
+  background-color: #f1f5f9 !important;
+  background-image:
+    linear-gradient(90deg, #047857, #05924a, #0e7490, #0970b8, #0369a1),
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.99) 0%,
+      #f8fafc 55%,
+      rgba(15, 23, 42, 0.06) 100%
+    ) !important;
+  background-size:
+    100% 5px,
+    100% 100% !important;
+  background-position:
+    top center,
+    0 0 !important;
+  background-repeat: no-repeat !important;
+  box-shadow:
+    0 0 0 1px rgba(5, 146, 74, 0.12),
+    inset 0 0 80px rgba(9, 112, 184, 0.04),
+    0 14px 48px -14px rgba(9, 112, 184, 0.2),
+    0 8px 32px -12px rgba(5, 146, 74, 0.12) !important;
+}
+
+:root.theme-brand .brand-submit-panel {
+  border: 1px solid rgba(9, 112, 184, 0.3) !important;
+  background:
+    linear-gradient(155deg, rgba(5, 146, 74, 0.1) 0%, #ffffff 45%, rgba(9, 112, 184, 0.1) 100%) !important;
+  box-shadow:
+    0 0 0 1px rgba(5, 146, 74, 0.1),
+    0 12px 40px -12px rgba(9, 112, 184, 0.16) !important;
+}
+
+:root.theme-brand .brand-submit-panel > div:first-child {
+  border-bottom-color: rgba(9, 112, 184, 0.12) !important;
+  background: linear-gradient(90deg, rgba(5, 146, 74, 0.14), rgba(9, 112, 184, 0.12)) !important;
+}
+
+:root.theme-brand .brand-submit-panel .border-cyan-400\/40 {
+  border-color: rgba(9, 112, 184, 0.45) !important;
+}
+:root.theme-brand .brand-submit-panel .bg-cyan-500\/10 {
+  background-color: rgba(9, 112, 184, 0.12) !important;
+}
+:root.theme-brand .brand-submit-panel .text-cyan-200 {
+  color: #0c4a6e !important;
+}
+
+:root.theme-brand .brand-submit-panel .border-violet-400\/40 {
+  border-color: rgba(5, 146, 74, 0.45) !important;
+}
+:root.theme-brand .brand-submit-panel .bg-violet-500\/10 {
+  background-color: rgba(5, 146, 74, 0.1) !important;
+}
+:root.theme-brand .brand-submit-panel .text-violet-200 {
+  color: #065f46 !important;
+}
+
+:root.theme-brand .brand-submit-panel textarea:focus,
+:root.theme-brand .brand-submit-panel input:focus,
+:root.theme-brand .brand-submit-panel select:focus {
+  border-color: #0970b8 !important;
+  box-shadow: 0 0 0 2px rgba(9, 112, 184, 0.35) !important;
+  outline: none !important;
+}
+
+:root.theme-brand .brand-cta {
+  background-image: linear-gradient(90deg, #0970b8 0%, #05924a 100%) !important;
+  color: #ffffff !important;
+}
+
+/* Keep white labels on blue/green gradients (.theme-light remaps .text-white to ink) */
+:root.theme-brand .bg-gradient-to-r.text-white,
+:root.theme-brand .bg-gradient-to-br.text-white,
+:root.theme-brand .brand-cta.text-white {
+  color: #ffffff !important;
+}
+
+/* Feedback board: filter strip — slightly darker “rail” for contrast */
+:root.theme-brand .brand-feedback-board .fb-filter-bar {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(9, 112, 184, 0.08) 100%) !important;
+  border: 1px solid rgba(9, 112, 184, 0.3) !important;
+  box-shadow:
+    0 0 0 1px rgba(5, 146, 74, 0.1),
+    0 8px 28px -10px rgba(9, 112, 184, 0.15) !important;
+}
+
+/* Feedback rows/cards — green accent rail + blue border for brand depth */
+:root.theme-brand .brand-feedback-board .fb-feedback-card {
+  background:
+    linear-gradient(165deg, rgba(255, 255, 255, 0.99) 0%, rgba(5, 146, 74, 0.1) 38%, rgba(9, 112, 184, 0.09) 100%) !important;
+  border: 1px solid rgba(9, 112, 184, 0.38) !important;
+  box-shadow:
+    inset 4px 0 0 0 #05924a,
+    0 0 0 1px rgba(9, 112, 184, 0.12),
+    0 12px 40px -14px rgba(9, 112, 184, 0.2),
+    0 6px 20px -10px rgba(5, 146, 74, 0.12) !important;
+}
+
+:root.theme-brand .brand-feedback-board .rounded-xl.border.border-slate-800:not(.fb-filter-bar):not(.fb-feedback-card) {
+  background:
+    linear-gradient(135deg, rgba(5, 146, 74, 0.1) 0%, #ffffff 45%, rgba(9, 112, 184, 0.1) 100%) !important;
+  border: 1px solid rgba(9, 112, 184, 0.25) !important;
+  box-shadow:
+    0 0 0 1px rgba(5, 146, 74, 0.08),
+    0 10px 32px -12px rgba(9, 112, 184, 0.14) !important;
+}
+
+:root.theme-brand .brand-feedback-board .border.border-slate-800.bg-slate-900\/50:not(.fb-feedback-card) {
+  background: linear-gradient(180deg, rgba(248, 250, 252, 0.98), rgba(239, 246, 255, 0.9)) !important;
+  border-color: rgba(9, 112, 184, 0.2) !important;
+}
+
+:root.theme-brand .brand-feedback-board .rounded-md.border.border-slate-700.bg-slate-900\/45 {
+  background: linear-gradient(180deg, #f8fafc 0%, rgba(9, 112, 184, 0.04) 100%) !important;
+  border: 1px solid rgba(5, 146, 74, 0.18) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
+}
+
+:root.theme-brand .brand-feedback-board .rounded-md.border.border-slate-700.bg-slate-900\/45 .text-slate-400 {
+  color: #64748b !important;
+}
+
+:root.theme-brand .brand-feedback-board .rounded-md.border.border-slate-700.bg-slate-900\/45 .text-slate-200 {
+  color: #1e293b !important;
+}
+
+:root.theme-brand .brand-dashboard-home .rounded-xl.border.border-white\/10.bg-slate-900\/90 {
+  background:
+    linear-gradient(165deg, rgba(5, 146, 74, 0.14) 0%, #ffffff 38%, rgba(9, 112, 184, 0.12) 100%) !important;
+  border: 1px solid rgba(9, 112, 184, 0.3) !important;
+  box-shadow:
+    0 0 0 1px rgba(5, 146, 74, 0.1),
+    0 10px 32px -10px rgba(9, 112, 184, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
+}
+
+:root.theme-brand .brand-dashboard-home .rounded-xl.border.border-white\/10.bg-slate-900\/70 {
+  background:
+    linear-gradient(180deg, #f1f5f9 0%, rgba(5, 146, 74, 0.08) 50%, rgba(9, 112, 184, 0.08) 100%) !important;
+  border: 1px solid rgba(9, 112, 184, 0.22) !important;
+}
+
+:root.theme-brand .app-footer {
+  background: rgba(255, 255, 255, 0.85) !important;
+  border-top-color: rgba(9, 112, 184, 0.15) !important;
+}
+
+:root.theme-brand .app-footer .text-slate-500,
+:root.theme-brand .app-footer .text-slate-400,
+:root.theme-brand .app-footer .text-slate-600 {
+  color: #64748b !important;
+}
+
+:root.theme-brand .brand-color-codes {
+  border-color: rgba(9, 112, 184, 0.2) !important;
+  background: linear-gradient(90deg, rgba(5, 146, 74, 0.06), rgba(255, 255, 255, 0.95), rgba(9, 112, 184, 0.08)) !important;
+}
+
+/* Analysis tab — cards + original feedback (align with transcript max-height, brand tints) */
+:root.theme-brand .analysis-brand-surface {
+  background:
+    linear-gradient(155deg, rgba(5, 146, 74, 0.14) 0%, #ffffff 38%, rgba(9, 112, 184, 0.14) 100%) !important;
+  border: 1px solid rgba(9, 112, 184, 0.3) !important;
+  box-shadow:
+    0 0 0 1px rgba(5, 146, 74, 0.1),
+    0 12px 36px -10px rgba(9, 112, 184, 0.16) !important;
+}
+
+:root.theme-brand .analysis-original-feedback {
+  background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 55%, rgba(9, 112, 184, 0.04) 100%) !important;
+  border-color: rgba(9, 112, 184, 0.2) !important;
+  color: #0f172a !important;
+}
+
+:root.theme-brand .analysis-panel .key-phrase-pill {
+  border-width: 1px !important;
+}
+
+/* Login / auth (light + brand): footer matches page gradient */
+.login-screen--light .app-footer {
+  border-top: 1px solid rgba(9, 112, 184, 0.22) !important;
+  background: linear-gradient(90deg, rgba(5, 146, 74, 0.1), #ffffff 45%, rgba(9, 112, 184, 0.12)) !important;
+  backdrop-filter: none !important;
+}
+
+.login-screen--light .app-footer .text-slate-500 {
+  color: #64748b !important;
+}
+
+.login-screen--light .app-footer .font-semibold {
+  color: #0f172a !important;
 }

@@ -154,7 +154,7 @@ export default function SubmitPanel({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="rounded-2xl border border-slate-800 bg-slate-900/70 shadow-[0_0_0_1px_rgba(255,255,255,0.03)]">
+    <form onSubmit={handleSubmit} className="brand-submit-panel rounded-2xl border border-slate-800 bg-slate-900/70 shadow-[0_0_0_1px_rgba(255,255,255,0.03)]">
       <div className="border-b border-slate-800 px-6 py-4">
         <h2 className="text-lg font-semibold text-slate-100">Submit Feedback</h2>
         <p className="mt-1 text-xs text-slate-400">Enter student feedback text for analysis. Sources can be simulated.</p>
@@ -245,7 +245,8 @@ export default function SubmitPanel({
             (mode === 'text' ? !(text || '').trim() || (text || '').trim().length < 10 : false) ||
             (mode === 'audio' ? isRecording || !audioFile : false)
           }
-          className="w-full rounded-lg border border-slate-600 bg-slate-700/60 px-4 py-2.5 text-sm font-medium text-slate-100 hover:bg-slate-700 disabled:opacity-60"
+          type="submit"
+          className="brand-cta w-full rounded-lg border border-transparent bg-gradient-to-r from-[#0970b8] to-[#05924a] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_4px_24px_-4px_rgba(9,112,184,0.55)] transition hover:brightness-110 disabled:opacity-60 disabled:hover:brightness-100"
         >
           {isSubmitting ? 'Analyzing & Submitting...' : 'Analyze Feedback'}
         </button>

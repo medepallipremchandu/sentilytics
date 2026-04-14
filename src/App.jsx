@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { ArrowRight, BarChart3, ClipboardList, Compass, LayoutPanelLeft, Loader2, LogOut, Mic, Send, Settings2, Shield, Sparkles, UserCircle2 } from 'lucide-react'
+import { ArrowRight, BarChart3, ChevronDown, ClipboardList, Compass, LayoutPanelLeft, Loader2, LogOut, Mic, Send, Settings2, Shield, Sparkles, UserCircle2 } from 'lucide-react'
 import AdminPanel from './components/admin/AdminPanel'
 import DashboardHome from './components/DashboardHome'
 import FeedbackBoard from './components/FeedbackBoard'
@@ -71,6 +71,13 @@ function App() {
   const [isFeedbackLoading, setIsFeedbackLoading] = useState(false)
   const [isFeedbackPaging, setIsFeedbackPaging] = useState(false)
   const [isAdminLoading, setIsAdminLoading] = useState(false)
+
+  const profileDisplayInitials = useMemo(() => {
+    if (!me?.name?.trim()) return '?'
+    const parts = me.name.trim().split(/\s+/).filter(Boolean)
+    if (parts.length >= 2) return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase()
+    return parts[0].slice(0, 2).toUpperCase()
+  }, [me?.name])
 
   const notify = (type, message) => {
     const id = `${Date.now()}-${Math.random()}`
@@ -919,78 +926,102 @@ function App() {
       <div className="flex flex-1 flex-col p-3 sm:p-4 md:p-6">
         <ToastContainer toasts={toasts} onDismiss={dismissToast} />
         <div className="mx-auto w-full max-w-[1440px] flex-1 space-y-3 sm:space-y-4">
-        {/* <div className="flex flex-col gap-2 rounded-xl border border-slate-800 bg-[#101116] px-3 py-2.5 sm:flex-row sm:items-center sm:justify-between sm:px-4 sm:py-3">
-          <div className="min-w-0 text-xs text-slate-300 sm:text-sm inline-flex flex-wrap items-center gap-x-2 gap-y-1">
-            <img src={APP_LOGO} alt={`${APP_NAME} logo`} className="h-7 w-7 shrink-0 rounded-lg border border-slate-700 bg-slate-900 p-1 sm:h-8 sm:w-8" />
-            <span className="font-semibold text-white">{APP_NAME}</span>
-            <span className="hidden text-slate-500 sm:inline">|</span>
-            <span className="min-w-0 truncate font-semibold text-white">{me.name}</span>
-            <span className="hidden max-w-[min(100%,20rem)] truncate text-slate-400 lg:inline">
-              ({me.roles.map((r) => r.name).join(', ')})
-            </span>
-          </div>
-        </div> */}
-
-        <div className="brand-top-bar flex flex-col gap-3 border-b border-slate-800 pb-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="w-full min-w-0 overflow-x-auto [-webkit-overflow-scrolling:touch] pb-0.5 sm:overflow-visible sm:pb-0">
-            <div className="brand-tab-list flex w-max gap-2 sm:flex-wrap sm:w-auto">
-              {visibleTabs.map((tab) => (
-                <button
-                  key={tab}
-                  type="button"
-                  onClick={() => handleTabNavigate(tab)}
-                  className={`brand-nav-tab shrink-0 rounded-lg border px-2.5 py-1.5 text-xs transition sm:px-3 sm:text-sm ${activeTab === tab ? 'border-amber-400/40 bg-amber-500/10 text-amber-200' : 'border-slate-700 bg-[#14151b] text-slate-300'}`}
-                >
-                  <span className="inline-flex items-center gap-1.5 sm:gap-2">
-                    {tabMeta[tab]?.icon ? React.createElement(tabMeta[tab].icon, { className: 'h-3.5 w-3.5 sm:h-4 sm:w-4' }) : null}
-                    {tabMeta[tab]?.label || tab.replace('_', ' ')}
+        <div className="brand-top-bar sticky top-0 z-40 isolate overflow-visible border-b border-slate-800 pb-1.5 sm:pb-2">
+          <div className="app-header-rail flex flex-col gap-1.5 rounded-lg border border-slate-800/90 bg-[#0b0c12]/85 px-2 py-1.5 shadow-[0_4px_20px_-10px_rgba(0,0,0,0.55)] backdrop-blur-md sm:flex-row sm:items-center sm:gap-2 sm:px-2.5 sm:py-1.5 md:gap-2.5">
+            <div className="app-header-lockup flex min-w-0 shrink-0 items-center gap-1.5 sm:max-w-[min(100%,42%)] lg:max-w-[min(100%,38%)]">
+              <img
+                src={APP_LOGO}
+                alt=""
+                className="app-header-logo h-6 w-6 shrink-0 rounded-md border border-slate-700/90 bg-slate-900/80 p-0.5 shadow-sm"
+              />
+              <div className="min-w-0 leading-none">
+                <p className="app-header-title truncate text-[12px] font-semibold tracking-tight text-white sm:text-[13px]">
+                  {APP_NAME}
+                  <span className="mx-1 hidden font-normal text-slate-500 sm:inline" aria-hidden>
+                    ·
                   </span>
-                </button>
-              ))}
+                  <span className="app-header-subtitle hidden font-normal leading-snug text-slate-400 sm:inline sm:text-[10px] md:text-[11px]">
+                    {APP_SUBTITLE}
+                  </span>
+                </p>
+                <p className="app-header-subtitle--stacked truncate text-[9px] leading-tight text-slate-500 sm:hidden">{APP_SUBTITLE}</p>
+              </div>
             </div>
-          </div>
-          <div ref={profileRef} className="relative flex shrink-0 justify-end">
-            <div className="flex items-center gap-2">
-              <ThemeSwitcher />
-              <button className="rounded-xl border border-slate-700 bg-slate-900 px-2.5 py-2 hover:bg-slate-800 sm:px-3" onClick={() => setProfileOpen((v) => !v)}>
-                <span className="inline-flex max-w-[10rem] items-center gap-2 sm:max-w-none">
-                  <UserCircle2 className="h-5 w-5 shrink-0 text-violet-300" />
-                  <span className="truncate text-sm">{me.name}</span>
-                </span>
-              </button>
+
+            <div className="app-header-tabs min-w-0 flex-1 overflow-x-auto overflow-y-visible [-webkit-overflow-scrolling:touch]">
+              <nav className="brand-tab-list flex w-max min-w-0 items-center gap-0.5 sm:gap-1" aria-label="Main navigation">
+                {visibleTabs.map((tab) => (
+                  <button
+                    key={tab}
+                    type="button"
+                    aria-current={activeTab === tab ? 'page' : undefined}
+                    onClick={() => handleTabNavigate(tab)}
+                    className={`brand-nav-tab ${activeTab === tab ? 'is-active' : ''}`}
+                  >
+                    <span className="inline-flex items-center gap-0.5 sm:gap-1">
+                      {tabMeta[tab]?.icon ? React.createElement(tabMeta[tab].icon, { className: 'nav-tab-icon h-2.5 w-2.5 sm:h-3 sm:w-3' }) : null}
+                      <span className="whitespace-nowrap">{tabMeta[tab]?.label || tab.replace('_', ' ')}</span>
+                    </span>
+                  </button>
+                ))}
+              </nav>
             </div>
-            {profileOpen && (
-              <div className="profile-menu absolute right-0 z-20 mt-2 w-44 rounded-xl border border-slate-700 bg-slate-900 p-1 shadow-xl">
+
+            <div ref={profileRef} className="app-header-actions relative z-50 flex w-full shrink-0 items-center justify-end sm:w-auto">
+              <div className="app-header-actions-inner">
+                <ThemeSwitcher />
                 <button
                   type="button"
-                  className="w-full rounded-lg px-3 py-2 text-left text-sm text-slate-200 hover:bg-slate-800"
-                  onClick={() => {
-                    setProfileModalOpen(true)
-                    setProfileOpen(false)
-                  }}
+                  aria-expanded={profileOpen}
+                  aria-haspopup="menu"
+                  className="app-header-profile-btn inline-flex h-[var(--app-header-ctrl-h)] max-w-full items-center gap-1 rounded-full py-0 pl-0.5 pr-1.5 text-left transition hover:bg-slate-800/90 sm:pr-2"
+                  onClick={() => setProfileOpen((v) => !v)}
                 >
-                  View Profile
-                </button>
-                <button
-                  type="button"
-                  className="inline-flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-slate-200 hover:bg-slate-800"
-                  onClick={handleLogout}
-                >
-                  <LogOut className="h-4 w-4" /> Logout
+                  <span
+                    className="app-header-avatar flex h-[calc(var(--app-header-ctrl-h)-2px)] w-[calc(var(--app-header-ctrl-h)-2px)] min-h-[1rem] min-w-[1rem] shrink-0 items-center justify-center rounded-full text-[9px] font-semibold leading-none text-white shadow-sm sm:text-[10px]"
+                    aria-hidden
+                  >
+                    {profileDisplayInitials}
+                  </span>
+                  <span className="hidden max-w-[6.5rem] truncate text-[11px] font-medium leading-none text-slate-100 md:inline lg:max-w-[8rem]">{me.name}</span>
+                  <ChevronDown className={`h-3 w-3 shrink-0 text-slate-500 transition ${profileOpen ? 'rotate-180' : ''}`} aria-hidden />
                 </button>
               </div>
-            )}
+              {profileOpen && (
+                <div className="profile-menu absolute right-0 top-full z-[60] mt-1.5 w-44 rounded-lg border border-slate-700 bg-slate-900 p-1 shadow-xl">
+                  <button
+                    type="button"
+                    className="w-full rounded-lg px-3 py-2 text-left text-sm text-slate-200 hover:bg-slate-800"
+                    onClick={() => {
+                      setProfileModalOpen(true)
+                      setProfileOpen(false)
+                    }}
+                  >
+                    View Profile
+                  </button>
+                  <button
+                    type="button"
+                    className="inline-flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-slate-200 hover:bg-slate-800"
+                    onClick={handleLogout}
+                  >
+                    <LogOut className="h-4 w-4" /> Logout
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
-        <div className="grid gap-4 lg:grid-cols-[minmax(0,320px)_1fr]">
-          {isDashboardAggregatesLoading && !dashboardAggregates ? (
-            <div className="brand-panel-sidebar rounded-2xl border border-slate-800 bg-[#101116] p-6 min-h-[260px]">
-              <PageLoader label="Loading aggregate insights..." />
-            </div>
-          ) : (
-            <AggregateInsightsSidebar dashboard={dashboard} aggregates={dashboardAggregates} recentRows={recentRows} onNavigateToBoard={goToFeedbackBoard} />
-          )}
+        <div className="brand-dashboard-grid grid gap-4 lg:grid-cols-[minmax(0,320px)_1fr] lg:items-start">
+          <div className="aggregate-insights-sticky min-w-0 lg:z-[15] lg:self-start lg:overflow-x-hidden lg:overflow-y-auto lg:overscroll-contain lg:pr-0.5">
+            {isDashboardAggregatesLoading && !dashboardAggregates ? (
+              <div className="brand-panel-sidebar rounded-2xl border border-slate-800 bg-[#101116] p-6 min-h-[260px]">
+                <PageLoader label="Loading aggregate insights..." />
+              </div>
+            ) : (
+              <AggregateInsightsSidebar dashboard={dashboard} aggregates={dashboardAggregates} recentRows={recentRows} onNavigateToBoard={goToFeedbackBoard} />
+            )}
+          </div>
           <div className="brand-panel-main min-w-0 rounded-xl p-1 sm:p-2 lg:min-h-0">
             {activeTab === 'dashboard' && (
               isDashboardLoading && !dashboard ? (

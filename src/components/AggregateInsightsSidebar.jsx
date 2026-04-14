@@ -29,7 +29,7 @@ export default function AggregateInsightsSidebar({ dashboard, aggregates, recent
     .map((t) => [t.topic, t.count])
 
   return (
-    <aside className="brand-panel-sidebar rounded-xl border border-white/10 bg-slate-900/90 p-3 text-slate-200 shadow-sm backdrop-blur-sm lg:sticky lg:top-3 lg:self-start">
+    <aside className="brand-panel-sidebar rounded-xl border border-white/10 bg-slate-900/90 p-3 text-slate-200 shadow-sm backdrop-blur-sm">
       <div className="flex items-start gap-2.5">
         <img src={APP_LOGO} alt="" className="mt-0.5 h-8 w-8 shrink-0 rounded-lg border border-white/10 bg-black/30 p-1" />
         <div className="min-w-0">

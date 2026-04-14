@@ -5,7 +5,7 @@ import { COPYRIGHT_HOLDER, COPYRIGHT_YEAR } from '../lib/branding'
 /** Minimal site-wide footer: one row, copyright left, tagline right. */
 export default function AppFooter() {
   return (
-    <footer className="app-footer mt-auto border-t border-white/[0.08] bg-white/[0.04] py-4 backdrop-blur-sm sm:py-5">
+    <footer className="app-footer sticky bottom-0 z-30 mt-auto w-full border-t border-white/[0.08] bg-white/[0.04] py-4 backdrop-blur-md sm:py-5">
       <div className="mx-auto flex w-full max-w-[1440px] flex-col items-center justify-between gap-3 px-3 sm:flex-row sm:px-4 md:px-6">
         <p className="text-center text-[12px] text-slate-500 sm:text-left">
           © {COPYRIGHT_YEAR}{' '}

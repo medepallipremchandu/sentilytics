@@ -90,7 +90,7 @@ export const ThemeSwitcher = () => {
         className="theme-switcher-trigger flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl border border-slate-700/90 bg-slate-900 p-0 shadow-sm transition hover:brightness-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0970b8]/50 sm:h-11 sm:w-11"
       >
         <span
-          className="flex h-full w-full items-center justify-center rounded-[10px]"
+          className="theme-switcher-gradient flex h-full w-full items-center justify-center rounded-[10px]"
           style={{
             background: `linear-gradient(135deg, ${BRAND_GREEN} 0%, ${BRAND_BLUE} 100%)`,
           }}
@@ -105,7 +105,7 @@ export const ThemeSwitcher = () => {
         <div
           role="menu"
           aria-label="Theme"
-          className="profile-menu theme-switcher-menu absolute right-0 z-[35] mt-2 min-w-[12rem] rounded-xl border border-slate-700 bg-slate-900 p-1 shadow-xl"
+          className="profile-menu theme-switcher-menu absolute right-0 z-[60] mt-1.5 min-w-[12rem] rounded-lg border border-slate-700 bg-slate-900 p-1 shadow-xl"
         >
           {THEME_OPTIONS.map(({ id, label, icon: Icon, title }) => (
             <button

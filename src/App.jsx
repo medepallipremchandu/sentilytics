@@ -1,10 +1,11 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { ArrowRight, BarChart3, ChevronDown, ClipboardList, Compass, LayoutPanelLeft, Loader2, LogOut, Mic, Send, Settings2, Shield, Sparkles, UserCircle2 } from 'lucide-react'
+import { ArrowRight, BarChart3, ChevronDown, ClipboardList, Compass, LayoutPanelLeft, Loader2, LogOut, Mic, Rss, Send, Settings2, Shield, Sparkles, UserCircle2 } from 'lucide-react'
 import AdminPanel from './components/admin/AdminPanel'
 import DashboardHome from './components/DashboardHome'
 import FeedbackBoard from './components/FeedbackBoard'
 import SubmitPanel from './components/SubmitPanel'
+import SocialFeedPanel from './components/SocialFeedPanel'
 import AggregateInsightsSidebar from './components/AggregateInsightsSidebar'
 import Modal from './components/common/Modal'
 import ToastContainer from './components/common/ToastContainer'
@@ -346,7 +347,7 @@ function App() {
   useEffect(() => {
     if (!me) return
     if (activeTab === 'admin') loadAdmin()
-    if (activeTab === 'submit' || activeTab === 'my_feedback' || activeTab === 'feedback_board') loadFormMeta()
+    if (activeTab === 'submit' || activeTab === 'social_feed' || activeTab === 'my_feedback' || activeTab === 'feedback_board') loadFormMeta()
   }, [activeTab, me])
 
   useEffect(() => {
@@ -402,6 +403,7 @@ function App() {
   const tabMeta = {
     dashboard: { label: 'Dashboard', icon: BarChart3 },
     submit: { label: 'Submit', icon: Send },
+    social_feed: { label: 'Social feed', icon: Rss },
     my_feedback: { label: 'My Feedback', icon: ClipboardList },
     feedback_board: { label: 'Feedback Board', icon: LayoutPanelLeft },
     admin: { label: 'Admin', icon: Settings2 },
@@ -497,6 +499,39 @@ function App() {
       await loadRecent({ page: 1, reset: true })
     } catch (err) {
       notify('error', err.message || 'Failed to submit feedback.')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const createBulkFeedback = async (file) => {
+    setIsSubmitting(true)
+    try {
+      if (!file) {
+        notify('warning', 'Please choose a CSV file first.')
+        return
+      }
+      const formData = new FormData()
+      formData.append('file', file)
+      if (sourceId) formData.append('source_id', sourceId)
+      if (departmentId) formData.append('department_id', departmentId)
+      if (courseCode.trim()) formData.append('course_code', courseCode.trim())
+      const res = await apiFetch('/feedback/bulk-csv', {
+        method: 'POST',
+        body: formData,
+        token,
+      })
+      setSourceId('')
+      setDepartmentId('')
+      setCourseCode('')
+      notify('success', `Imported ${res.imported || 0} feedback row(s) from CSV.`)
+      if (activeTab === 'my_feedback' || activeTab === 'feedback_board') loadFeedback(1)
+      await refreshDashboard()
+      await loadDashboardAggregates()
+      await loadRecent({ page: 1, reset: true })
+      goToFeedbackBoard()
+    } catch (err) {
+      notify('error', err.message || 'CSV upload failed.')
     } finally {
       setIsSubmitting(false)
     }
@@ -783,6 +818,7 @@ function App() {
                       setCourseCode={setCourseCode}
                       sources={formMeta.sources}
                       departments={formMeta.departments}
+                      onBulkSubmit={null}
                     />
                   </div>
                 </div>
@@ -1069,6 +1105,25 @@ function App() {
                 setCourseCode={setCourseCode}
                 sources={formMeta.sources}
                 departments={formMeta.departments}
+                onBulkSubmit={
+                  me.permissions.includes('feedback.bulk_csv') || me.permissions.includes('system.superadmin')
+                    ? createBulkFeedback
+                    : null
+                }
+              />
+            )}
+
+            {activeTab === 'social_feed' && me.permissions.includes('social_feed.demo') && (
+              <SocialFeedPanel
+                token={token}
+                notify={notify}
+                formMeta={formMeta}
+                permissions={me.permissions || []}
+                onImportDone={async () => {
+                  await refreshDashboard()
+                  await loadDashboardAggregates()
+                  await loadRecent({ page: 1, reset: true })
+                }}
               />
             )}
 

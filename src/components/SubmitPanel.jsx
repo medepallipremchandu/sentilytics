@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { Mic, Square, UploadCloud } from 'lucide-react'
+import { FileSpreadsheet, Mic, Square, UploadCloud } from 'lucide-react'
 
 function audioBufferToWavBlob(audioBuffer) {
   const channels = audioBuffer.numberOfChannels
@@ -76,12 +76,16 @@ export default function SubmitPanel({
   setCourseCode,
   sources = [],
   departments = [],
+  onBulkSubmit,
 }) {
   const [isRecording, setIsRecording] = useState(false)
   const [recordSeconds, setRecordSeconds] = useState(0)
   const mediaRecorderRef = useRef(null)
   const chunksRef = useRef([])
   const [formError, setFormError] = useState('')
+  const [bulkFile, setBulkFile] = useState(null)
+  const [isDragActive, setIsDragActive] = useState(false)
+  const canUseBulk = typeof onBulkSubmit === 'function'
 
   useEffect(() => {
     if (!isRecording) return
@@ -91,7 +95,11 @@ export default function SubmitPanel({
 
   useEffect(() => {
     setFormError('')
-  }, [mode, text, audioFile, isRecording])
+  }, [mode, text, audioFile, isRecording, bulkFile])
+
+  useEffect(() => {
+    if (mode === 'bulk' && !canUseBulk) setMode('text')
+  }, [mode, canUseBulk, setMode])
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -112,7 +120,18 @@ export default function SubmitPanel({
         return
       }
     }
-    onSubmit(e)
+    if (mode === 'bulk') {
+      if (!canUseBulk) {
+        setFormError('Bulk upload is not available in this screen.')
+        return
+      }
+      if (!bulkFile) {
+        setFormError('Please choose a CSV file to upload.')
+        return
+      }
+    }
+    if (mode === 'bulk') onBulkSubmit(bulkFile)
+    else onSubmit(e)
   }
 
   const fmt = useMemo(() => {
@@ -153,6 +172,16 @@ export default function SubmitPanel({
     setIsRecording(false)
   }
 
+  const pickBulkFile = (file) => {
+    if (!file) return
+    const isCsv = file.type === 'text/csv' || file.name.toLowerCase().endsWith('.csv')
+    if (!isCsv) {
+      setFormError('Only CSV files are supported for bulk upload.')
+      return
+    }
+    setBulkFile(file)
+  }
+
   return (
     <form onSubmit={handleSubmit} className="brand-submit-panel rounded-2xl border border-slate-800 bg-slate-900/70 shadow-[0_0_0_1px_rgba(255,255,255,0.03)]">
       <div className="border-b border-slate-800 px-6 py-4">
@@ -163,6 +192,16 @@ export default function SubmitPanel({
         <div className="flex gap-2">
           <button type="button" disabled={isSubmitting} className={`rounded-lg border px-3 py-2 text-sm ${mode === 'text' ? 'border-cyan-400/40 bg-cyan-500/10 text-cyan-200' : 'border-slate-700 bg-slate-900 text-slate-300'} disabled:opacity-50`} onClick={() => setMode('text')}>Text</button>
           <button type="button" disabled={isSubmitting} className={`rounded-lg border px-3 py-2 text-sm ${mode === 'audio' ? 'border-violet-400/40 bg-violet-500/10 text-violet-200' : 'border-slate-700 bg-slate-900 text-slate-300'} disabled:opacity-50`} onClick={() => setMode('audio')}>Audio</button>
+          {canUseBulk ? (
+            <button
+              type="button"
+              disabled={isSubmitting}
+              className={`rounded-lg border px-3 py-2 text-sm ${mode === 'bulk' ? 'border-emerald-400/40 bg-emerald-500/10 text-emerald-200' : 'border-slate-700 bg-slate-900 text-slate-300'} disabled:opacity-50`}
+              onClick={() => setMode('bulk')}
+            >
+              Bulk CSV
+            </button>
+          ) : null}
         </div>
 
         {mode === 'text' && (
@@ -213,6 +252,62 @@ export default function SubmitPanel({
           </div>
         )}
 
+        {mode === 'bulk' && canUseBulk && (
+          <div className="space-y-3">
+            <div>
+              <h3 className="text-base font-semibold text-slate-100">Batch CSV Analysis</h3>
+              <p className="mt-1 text-xs text-slate-400">
+                Upload a CSV with a <span className="font-semibold text-slate-300">text</span> column (optional columns: source, department, course_code). Up to 500 rows.
+              </p>
+            </div>
+            <label
+              className={`block cursor-pointer rounded-xl border-2 border-dashed p-6 text-center transition ${
+                isDragActive ? 'border-emerald-400/70 bg-emerald-500/10' : 'border-slate-700 bg-slate-900/40 hover:border-slate-500'
+              }`}
+              onDragOver={(e) => {
+                e.preventDefault()
+                setIsDragActive(true)
+              }}
+              onDragLeave={() => setIsDragActive(false)}
+              onDrop={(e) => {
+                e.preventDefault()
+                setIsDragActive(false)
+                pickBulkFile(e.dataTransfer.files?.[0] || null)
+              }}
+            >
+              <input
+                type="file"
+                accept=".csv,text/csv"
+                className="hidden"
+                disabled={isSubmitting}
+                onChange={(e) => pickBulkFile(e.target.files?.[0] || null)}
+              />
+              <div className="flex flex-col items-center gap-2">
+                <span className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-600 bg-slate-900/70">
+                  <UploadCloud className="h-5 w-5 text-slate-300" />
+                </span>
+                <p className="text-lg font-semibold text-slate-100">Drop a CSV file here, or click to browse</p>
+                <p className="text-sm text-slate-400">One column named text is required</p>
+              </div>
+            </label>
+            {bulkFile ? (
+              <div className="inline-flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-900/60 px-3 py-2 text-sm text-slate-200">
+                <FileSpreadsheet className="h-4 w-4 text-emerald-300" />
+                <span>{bulkFile.name}</span>
+                <span className="text-xs text-slate-400">({Math.max(1, Math.round(bulkFile.size / 1024))} KB)</span>
+              </div>
+            ) : null}
+            <a
+              className="inline-flex items-center text-xs text-slate-400 underline hover:text-slate-200"
+              href="#"
+              onClick={(e) => e.preventDefault()}
+            >
+              CSV format guide
+            </a>
+            {formError && mode === 'bulk' ? <p className="mt-1 text-xs text-red-200">{formError}</p> : null}
+          </div>
+        )}
+
         <div className="grid gap-3 md:grid-cols-2">
           <div>
             <label className="mb-1 block text-xs font-medium text-slate-300">
@@ -243,12 +338,13 @@ export default function SubmitPanel({
           disabled={
             isSubmitting ||
             (mode === 'text' ? !(text || '').trim() || (text || '').trim().length < 10 : false) ||
-            (mode === 'audio' ? isRecording || !audioFile : false)
+            (mode === 'audio' ? isRecording || !audioFile : false) ||
+            (mode === 'bulk' ? !bulkFile : false)
           }
           type="submit"
           className="brand-cta w-full rounded-lg border border-transparent bg-gradient-to-r from-[#0970b8] to-[#05924a] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_4px_24px_-4px_rgba(9,112,184,0.55)] transition hover:brightness-110 disabled:opacity-60 disabled:hover:brightness-100"
         >
-          {isSubmitting ? 'Analyzing & Submitting...' : 'Analyze Feedback'}
+          {isSubmitting ? 'Analyzing & Submitting...' : mode === 'bulk' ? 'Upload & Analyze CSV' : 'Analyze Feedback'}
         </button>
       </div>
     </form>

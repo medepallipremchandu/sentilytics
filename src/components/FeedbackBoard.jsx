@@ -215,6 +215,8 @@ export default function FeedbackBoard({
             <option value="">Type</option>
             <option value="audio">Audio</option>
             <option value="text">Text</option>
+            <option value="reddit">Reddit</option>
+            <option value="bluesky">Bluesky</option>
           </select>
           <select className={selectCls} value={filters.priority || ''} onChange={(e) => setFilters({ ...filters, priority: e.target.value })}>
             <option value="">Priority</option>
@@ -657,10 +659,14 @@ function InputTypePill({ value }) {
   const map = {
     audio: 'bg-indigo-500/15 border-indigo-400/25 text-indigo-200',
     text: 'bg-cyan-500/15 border-cyan-400/25 text-cyan-200',
+    reddit: 'bg-orange-500/15 border-orange-400/25 text-orange-200',
+    bluesky: 'bg-sky-500/15 border-sky-400/25 text-sky-200',
   }
+  const label =
+    value === 'audio' ? 'Audio' : value === 'reddit' ? 'Reddit' : value === 'bluesky' ? 'Bluesky' : 'Text'
   return (
     <span className={`px-2.5 py-1 rounded-full border text-xs uppercase ${map[value] || 'bg-slate-500/10 border-slate-400/20 text-slate-200'}`}>
-      {value === 'audio' ? 'Audio' : 'Text'}
+      {label}
     </span>
   )
 }

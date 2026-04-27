@@ -100,6 +100,8 @@ export default function FeedbackBoard({
   canUpdate,
   canViewCost,
   canViewAnalysis,
+  canUseNaturalLanguageSearch = false,
+  onNaturalLanguageSearch,
   permissions = [],
   onMark,
   hideDetails = false,
@@ -107,6 +109,9 @@ export default function FeedbackBoard({
   const [expandedRowId, setExpandedRowId] = useState(null)
   const [analysisTab, setAnalysisTab] = useState('analysis')
   const [layoutView, setLayoutView] = useState('list')
+  const [naturalLanguageDraft, setNaturalLanguageDraft] = useState('')
+  const [isNaturalLanguageSearching, setIsNaturalLanguageSearching] = useState(false)
+  const [aiAppliedFilters, setAiAppliedFilters] = useState(null)
   const [draftSearch, setDraftSearch] = useState(() => filters.search || '')
   const [draftCourseCode, setDraftCourseCode] = useState(() => filters.course_code || '')
 
@@ -154,9 +159,115 @@ export default function FeedbackBoard({
     return base.sort((a, b) => a - b)
   }, [pagination.page_size])
 
+  const aiFilterChips = useMemo(() => {
+    if (!aiAppliedFilters) return []
+    const chips = []
+    const pushIf = (key, label, value) => {
+      if (!String(value || '').trim()) return
+      chips.push({ key, label, value: String(value) })
+    }
+    pushIf('status', 'Status', aiAppliedFilters.status)
+    pushIf('sentiment', 'Sentiment', aiAppliedFilters.sentiment)
+    pushIf('input_type', 'Type', aiAppliedFilters.input_type)
+    pushIf('priority', 'Priority', aiAppliedFilters.priority)
+    pushIf('source_id', 'Source', sourceMap[String(aiAppliedFilters.source_id)] || aiAppliedFilters.source_id)
+    pushIf('department_id', 'Department', departmentMap[String(aiAppliedFilters.department_id)] || aiAppliedFilters.department_id)
+    pushIf('course_code', 'Course', aiAppliedFilters.course_code)
+    pushIf('search', 'Search', aiAppliedFilters.search)
+    return chips
+  }, [aiAppliedFilters, sourceMap, departmentMap])
+
+  const clearAiAppliedFilters = () => {
+    if (!aiAppliedFilters || Object.keys(aiAppliedFilters).length === 0) return
+    setFilters((prev) => {
+      const next = { ...(prev || {}) }
+      Object.entries(aiAppliedFilters).forEach(([key, aiValue]) => {
+        // Only clear filters that are still exactly what AI set.
+        if (String(next[key] ?? '') === String(aiValue ?? '')) {
+          next[key] = ''
+        }
+      })
+      return next
+    })
+    setAiAppliedFilters(null)
+  }
+
   return (
     <div className="brand-feedback-board space-y-4">
       <div className="fb-filter-bar rounded-xl border border-slate-800 bg-slate-900/40 p-2 sm:p-3">
+        {canUseNaturalLanguageSearch ? (
+          <div className="mb-2">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+              <input
+                type="text"
+                value={naturalLanguageDraft}
+                onChange={(e) => setNaturalLanguageDraft(e.target.value)}
+                onKeyDown={async (e) => {
+                  if (e.key !== 'Enter') return
+                  e.preventDefault()
+                  const q = naturalLanguageDraft.trim()
+                  if (!q || !onNaturalLanguageSearch) return
+                  setIsNaturalLanguageSearching(true)
+                  try {
+                    const nextFilters = await onNaturalLanguageSearch(q)
+                    const onlyAiApplied = Object.fromEntries(
+                      Object.entries(nextFilters || {}).filter(([, value]) => String(value || '').trim() !== ''),
+                    )
+                    setAiAppliedFilters(Object.keys(onlyAiApplied).length ? onlyAiApplied : null)
+                  } finally {
+                    setIsNaturalLanguageSearching(false)
+                  }
+                }}
+                placeholder="Ask in plain language (e.g. show social sciences negative feedback)"
+                className="h-8 w-full rounded-lg border border-slate-700/90 bg-slate-900/30 px-2.5 text-xs text-slate-200 outline-none placeholder:text-slate-500"
+              />
+              <button
+                type="button"
+                disabled={isNaturalLanguageSearching || !naturalLanguageDraft.trim()}
+                className={`nl-ai-search-btn h-8 shrink-0 rounded-lg border px-3 text-xs font-medium transition disabled:cursor-not-allowed disabled:opacity-70 ${
+                  naturalLanguageDraft.trim() ? 'is-ready' : ''
+                }`}
+                onClick={async () => {
+                  const q = naturalLanguageDraft.trim()
+                  if (!q || !onNaturalLanguageSearch) return
+                  setIsNaturalLanguageSearching(true)
+                  try {
+                    const nextFilters = await onNaturalLanguageSearch(q)
+                    const onlyAiApplied = Object.fromEntries(
+                      Object.entries(nextFilters || {}).filter(([, value]) => String(value || '').trim() !== ''),
+                    )
+                    setAiAppliedFilters(Object.keys(onlyAiApplied).length ? onlyAiApplied : null)
+                  } finally {
+                    setIsNaturalLanguageSearching(false)
+                  }
+                }}
+              >
+                {isNaturalLanguageSearching ? 'Searching...' : 'AI Search'}
+              </button>
+            </div>
+            {aiFilterChips.length > 0 ? (
+              <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                <span className="text-[11px] text-slate-400">AI applied filters:</span>
+                {aiFilterChips.map((chip) => (
+                  <span
+                    key={chip.key}
+                    className="inline-flex items-center gap-1 rounded-full border border-violet-400/30 bg-violet-500/10 px-2 py-0.5 text-[11px] text-violet-100"
+                  >
+                    <span className="text-violet-200/80">{chip.label}:</span>
+                    <span>{chip.value}</span>
+                  </span>
+                ))}
+                <button
+                  type="button"
+                  className="rounded-full border border-slate-500/40 bg-slate-800/70 px-2 py-0.5 text-[11px] text-slate-200 transition hover:bg-slate-700"
+                  onClick={clearAiAppliedFilters}
+                >
+                  Clear AI filters
+                </button>
+              </div>
+            ) : null}
+          </div>
+        ) : null}
         <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-stretch">
           <div className="grid min-w-0 flex-1 grid-cols-1 gap-2 sm:grid-cols-2">
             <FilterSearchBox
@@ -217,6 +328,7 @@ export default function FeedbackBoard({
             <option value="text">Text</option>
             <option value="reddit">Reddit</option>
             <option value="bluesky">Bluesky</option>
+            <option value="facebook">Facebook</option>
           </select>
           <select className={selectCls} value={filters.priority || ''} onChange={(e) => setFilters({ ...filters, priority: e.target.value })}>
             <option value="">Priority</option>
@@ -363,18 +475,22 @@ export default function FeedbackBoard({
 
                   {canUpdate && (
                     <>
-                      <button
-                        className="rounded-md border border-amber-500/40 bg-amber-700 hover:bg-amber-600 px-2 py-1 text-[11px] text-white"
-                        onClick={() => onMark(row.id, 'inprogress')}
-                      >
-                        Mark In Progress
-                      </button>
-                      <button
-                        className="rounded-md border border-emerald-500/40 bg-emerald-700 hover:bg-emerald-600 px-2 py-1 text-[11px] text-white"
-                        onClick={() => onMark(row.id, 'completed')}
-                      >
-                        Mark Completed
-                      </button>
+                      {row.status !== 'inprogress' && row.status !== 'completed' ? (
+                        <button
+                          className="rounded-md border border-amber-500/40 bg-amber-700 hover:bg-amber-600 px-2 py-1 text-[11px] text-white"
+                          onClick={() => onMark(row.id, 'inprogress')}
+                        >
+                          Action Inprogress
+                        </button>
+                      ) : null}
+                      {row.status !== 'completed' ? (
+                        <button
+                          className="rounded-md border border-emerald-500/40 bg-emerald-700 hover:bg-emerald-600 px-2 py-1 text-[11px] text-white"
+                          onClick={() => onMark(row.id, 'completed')}
+                        >
+                          Action Completed
+                        </button>
+                      ) : null}
                     </>
                   )}
                 </div>
@@ -661,9 +777,18 @@ function InputTypePill({ value }) {
     text: 'bg-cyan-500/15 border-cyan-400/25 text-cyan-200',
     reddit: 'bg-orange-500/15 border-orange-400/25 text-orange-200',
     bluesky: 'bg-sky-500/15 border-sky-400/25 text-sky-200',
+    facebook: 'bg-blue-600/15 border-blue-400/25 text-blue-200',
   }
   const label =
-    value === 'audio' ? 'Audio' : value === 'reddit' ? 'Reddit' : value === 'bluesky' ? 'Bluesky' : 'Text'
+    value === 'audio'
+      ? 'Audio'
+      : value === 'reddit'
+        ? 'Reddit'
+        : value === 'bluesky'
+          ? 'Bluesky'
+          : value === 'facebook'
+            ? 'Facebook'
+            : 'Text'
   return (
     <span className={`px-2.5 py-1 rounded-full border text-xs uppercase ${map[value] || 'bg-slate-500/10 border-slate-400/20 text-slate-200'}`}>
       {label}

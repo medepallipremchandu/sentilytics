@@ -51,6 +51,7 @@ export default function AdminPanel({
     { key: 'permissions.manage', enabled: 'Can add new permission entries.', disabled: 'Cannot create new permissions.' },
     { key: 'feedback.create', enabled: 'Can submit feedback (text/audio).', disabled: 'Submit feature is blocked.' },
     { key: 'feedback.read_own', enabled: 'Can view personal feedback history.', disabled: 'My Feedback list is unavailable.' },
+    { key: 'feedbackboard.naturallanguagesearch', enabled: 'Can use AI natural language search in My Feedback and Feedback Board to auto-apply filters.', disabled: 'AI search box is hidden and endpoint is blocked.' },
     { key: 'feedback.submitter.view', enabled: 'Can see the submitter name beside the date on feedback cards.', disabled: 'Submitter name is hidden.' },
     { key: 'feedback.read_all', enabled: 'Can view all feedback board records.', disabled: 'Cannot access global feedback board.' },
     { key: 'feedback.read_assigned', enabled: 'Can view assigned feedback scope (role-based).', disabled: 'Assigned-only visibility is unavailable.' },

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useMemo, useRef } from 'react'
 import {
   AlertCircle,
   BarChart3,
@@ -221,6 +221,12 @@ export default function DashboardHome({
   onNavigateToBoard,
   onViewAnalysis,
   onMark,
+  filters = {},
+  setFilters,
+  onApplyFilters,
+  onResetFilters,
+  formMeta = { sources: [], departments: [] },
+  isFiltering = false,
 }) {
   if (!dashboard) return null
 
@@ -296,6 +302,13 @@ export default function DashboardHome({
     : []
 
   const chartH = 168
+  const dashboardSelectCls =
+    'fb-select h-8 min-w-[8.75rem] rounded-lg border border-slate-700 bg-slate-900/50 px-2 py-1.5 text-[11px] text-slate-200 outline-none transition focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/30'
+  const currentFilters = filters || {}
+  const hasActiveFilters = useMemo(
+    () => Object.values(currentFilters).some((v) => String(v || '').trim() !== ''),
+    [currentFilters],
+  )
 
   const loadMoreSentinelRef = useRef(null)
   useEffect(() => {
@@ -362,6 +375,94 @@ export default function DashboardHome({
             <span className="hidden sm:inline">Dense view · charts use full dataset</span>
             <span className="sm:hidden">Dense</span>
           </div>
+        </div>
+      </motion.div>
+
+      <motion.div
+        variants={itemVariants}
+        className="dashboard-filter-bar rounded-xl border border-white/10 bg-slate-900/90 p-2.5"
+      >
+        <div className="flex flex-wrap items-center gap-2">
+          <select
+            className={dashboardSelectCls}
+            value={currentFilters.status || ''}
+            onChange={(e) => setFilters?.((prev) => ({ ...prev, status: e.target.value }))}
+          >
+            <option value="">All Status</option>
+            <option value="soon">Soon</option>
+            <option value="inprogress">In Progress</option>
+            <option value="completed">Completed</option>
+          </select>
+          <select
+            className={dashboardSelectCls}
+            value={currentFilters.sentiment || ''}
+            onChange={(e) => setFilters?.((prev) => ({ ...prev, sentiment: e.target.value }))}
+          >
+            <option value="">All Sentiment</option>
+            <option value="positive">Positive</option>
+            <option value="neutral">Neutral</option>
+            <option value="negative">Negative</option>
+            <option value="mixed">Mixed</option>
+          </select>
+          <select
+            className={dashboardSelectCls}
+            value={currentFilters.input_type || ''}
+            onChange={(e) => setFilters?.((prev) => ({ ...prev, input_type: e.target.value }))}
+          >
+            <option value="">All Sources</option>
+            <option value="text">Text</option>
+            <option value="audio">Audio</option>
+          </select>
+          <select
+            className={dashboardSelectCls}
+            value={currentFilters.priority || ''}
+            onChange={(e) => setFilters?.((prev) => ({ ...prev, priority: e.target.value }))}
+          >
+            <option value="">All Priority</option>
+            <option value="high">High</option>
+            <option value="medium">Medium</option>
+            <option value="low">Low</option>
+          </select>
+          <select
+            className={dashboardSelectCls}
+            value={currentFilters.source_id || ''}
+            onChange={(e) => setFilters?.((prev) => ({ ...prev, source_id: e.target.value }))}
+          >
+            <option value="">All Channels</option>
+            {(formMeta.sources || []).map((src) => (
+              <option key={src.id} value={src.id}>
+                {src.name}
+              </option>
+            ))}
+          </select>
+          <select
+            className={dashboardSelectCls}
+            value={currentFilters.department_id || ''}
+            onChange={(e) => setFilters?.((prev) => ({ ...prev, department_id: e.target.value }))}
+          >
+            <option value="">All Departments</option>
+            {(formMeta.departments || []).map((dept) => (
+              <option key={dept.id} value={dept.id}>
+                {dept.name}
+              </option>
+            ))}
+          </select>
+          <button
+            type="button"
+            disabled={isFiltering}
+            className="h-8 rounded-lg border border-amber-400/40 bg-amber-500/10 px-3 py-1.5 text-[11px] font-medium text-amber-200 transition hover:bg-amber-500/15 disabled:cursor-wait disabled:opacity-70"
+            onClick={() => onApplyFilters?.()}
+          >
+            {isFiltering ? 'Applying...' : 'Apply Filters'}
+          </button>
+          <button
+            type="button"
+            disabled={!hasActiveFilters || isFiltering}
+            className="h-8 rounded-lg border border-white/15 bg-slate-900/30 px-3 py-1.5 text-[11px] font-medium text-slate-200 transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-55"
+            onClick={() => onResetFilters?.()}
+          >
+            Reset
+          </button>
         </div>
       </motion.div>
 
@@ -441,6 +542,22 @@ export default function DashboardHome({
               <Tooltip contentStyle={tooltipContentStyle} labelStyle={tooltipLabelStyle} itemStyle={tooltipItemStyle} />
             </PieChart>
           </ResponsiveContainer>
+          <div className="mt-1 flex flex-wrap gap-1.5">
+            {statusPie.map((entry) => (
+              <button
+                key={entry.name}
+                type="button"
+                className="inline-flex items-center gap-1 rounded-md border border-white/10 bg-slate-900/40 px-2 py-0.5 text-[10px] text-slate-200"
+                onClick={() => {
+                  const status = STATUS_PIE_MAP[entry.name]
+                  if (status && onNavigateToBoard) onNavigateToBoard({ status })
+                }}
+              >
+                <span className="h-2 w-2 rounded-full" style={{ backgroundColor: entry.color }} />
+                {entry.name}: <strong className="tabular-nums">{entry.value}</strong>
+              </button>
+            ))}
+          </div>
         </ChartCard>
 
         <ChartCard title="Channel" icon={<BarChart3 className="h-3 w-3" />}>
@@ -475,6 +592,22 @@ export default function DashboardHome({
               </Bar>
             </BarChart>
           </ResponsiveContainer>
+          <div className="mt-1 flex flex-wrap gap-1.5">
+            {sourceBar.map((entry) => (
+              <button
+                key={entry.name}
+                type="button"
+                className="inline-flex items-center gap-1 rounded-md border border-white/10 bg-slate-900/40 px-2 py-0.5 text-[10px] text-slate-200"
+                onClick={() => {
+                  if (!onNavigateToBoard) return
+                  onNavigateToBoard({ input_type: entry.name === 'Text' ? 'text' : 'audio' })
+                }}
+              >
+                <span className="h-2 w-2 rounded-full" style={{ backgroundColor: entry.color }} />
+                {entry.name}: <strong className="tabular-nums">{entry.value}</strong>
+              </button>
+            ))}
+          </div>
         </ChartCard>
 
         {canViewCostSafe ? (
@@ -489,6 +622,17 @@ export default function DashboardHome({
                 <Tooltip contentStyle={tooltipContentStyle} labelStyle={tooltipLabelStyle} itemStyle={tooltipItemStyle} />
               </PieChart>
             </ResponsiveContainer>
+          <div className="mt-1 flex flex-wrap gap-1.5">
+            {costPie.map((entry) => (
+              <span
+                key={entry.name}
+                className="inline-flex items-center gap-1 rounded-md border border-white/10 bg-slate-900/40 px-2 py-0.5 text-[10px] text-slate-200"
+              >
+                <span className="h-2 w-2 rounded-full" style={{ backgroundColor: entry.color }} />
+                {entry.name}: <strong className="tabular-nums">${Number(entry.value || 0).toFixed(4)}</strong>
+              </span>
+            ))}
+          </div>
             <div className="mt-1 text-[10px] tabular-nums text-slate-400">
               Total ${Number(dashboard.total_ai_cost_usd || 0).toFixed(4)}
             </div>
@@ -534,6 +678,24 @@ export default function DashboardHome({
               <Tooltip contentStyle={tooltipContentStyle} labelStyle={tooltipLabelStyle} itemStyle={tooltipItemStyle} />
             </PieChart>
           </ResponsiveContainer>
+          <div className="mt-1 flex flex-wrap gap-1.5">
+            {sentimentPie
+              .filter((entry) => entry.value > 0)
+              .map((entry) => (
+                <button
+                  key={entry.name}
+                  type="button"
+                  className="inline-flex items-center gap-1 rounded-md border border-white/10 bg-slate-900/40 px-2 py-0.5 text-[10px] text-slate-200"
+                  onClick={() => {
+                    const sentiment = SENTIMENT_PIE_MAP[entry.name]
+                    if (sentiment && onNavigateToBoard) onNavigateToBoard({ sentiment })
+                  }}
+                >
+                  <span className="h-2 w-2 rounded-full" style={{ backgroundColor: entry.color }} />
+                  {entry.name}: <strong className="tabular-nums">{entry.value}</strong>
+                </button>
+              ))}
+          </div>
         </ChartCard>
 
         <ChartCard title="Topics" icon={<BarChart3 className="h-3 w-3" />} className="lg:col-span-1">
@@ -653,24 +815,28 @@ export default function DashboardHome({
                       ) : null}
                       {canUpdate ? (
                         <>
-                          <motion.button
-                            type="button"
-                            whileHover={{ scale: 1.03 }}
-                            whileTap={{ scale: 0.97 }}
-                            className="rounded-lg border border-amber-500/40 bg-amber-700 hover:bg-amber-600 px-3 py-2 text-xs text-white"
-                            onClick={() => onMark(row.id, 'inprogress')}
-                          >
-                            Mark In Progress
-                          </motion.button>
-                          <motion.button
-                            type="button"
-                            whileHover={{ scale: 1.03 }}
-                            whileTap={{ scale: 0.97 }}
-                            className="rounded-lg border border-emerald-500/40 bg-emerald-700 hover:bg-emerald-600 px-3 py-2 text-xs text-white"
-                            onClick={() => onMark(row.id, 'completed')}
-                          >
-                            Mark Completed
-                          </motion.button>
+                          {row.status !== 'inprogress' && row.status !== 'completed' ? (
+                            <motion.button
+                              type="button"
+                              whileHover={{ scale: 1.03 }}
+                              whileTap={{ scale: 0.97 }}
+                              className="rounded-lg border border-amber-500/40 bg-amber-700 hover:bg-amber-600 px-3 py-2 text-xs text-white"
+                              onClick={() => onMark(row.id, 'inprogress')}
+                            >
+                              Action Inprogress
+                            </motion.button>
+                          ) : null}
+                          {row.status !== 'completed' ? (
+                            <motion.button
+                              type="button"
+                              whileHover={{ scale: 1.03 }}
+                              whileTap={{ scale: 0.97 }}
+                              className="rounded-lg border border-emerald-500/40 bg-emerald-700 hover:bg-emerald-600 px-3 py-2 text-xs text-white"
+                              onClick={() => onMark(row.id, 'completed')}
+                            >
+                              Action Completed
+                            </motion.button>
+                          ) : null}
                         </>
                       ) : null}
                     </div>

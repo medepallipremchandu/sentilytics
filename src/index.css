@@ -869,6 +869,48 @@
   color: #1e293b !important;
 }
 
+/* AI natural language search button states across themes */
+.nl-ai-search-btn {
+  border-color: rgba(148, 163, 184, 0.5);
+}
+
+/* Light/default state: before user types */
+:root.theme-dark .nl-ai-search-btn {
+  background: rgba(139, 92, 246, 0.16);
+  color: #ddd6fe;
+}
+
+:root.theme-light:not(.theme-brand) .nl-ai-search-btn {
+  background: rgba(124, 58, 237, 0.12);
+  border-color: rgba(124, 58, 237, 0.35);
+  color: #4c1d95;
+}
+
+:root.theme-brand .nl-ai-search-btn {
+  background: linear-gradient(90deg, rgba(9, 112, 184, 0.2), rgba(5, 146, 74, 0.18));
+  border-color: rgba(9, 112, 184, 0.45);
+  color: #0f172a;
+}
+
+/* Bright/active state: after user types text */
+:root.theme-dark .nl-ai-search-btn.is-ready {
+  background: linear-gradient(90deg, #7c3aed, #4f46e5);
+  border-color: rgba(167, 139, 250, 0.8);
+  color: #ffffff;
+}
+
+:root.theme-light:not(.theme-brand) .nl-ai-search-btn.is-ready {
+  background: linear-gradient(90deg, #7c3aed, #4f46e5);
+  border-color: rgba(99, 102, 241, 0.75);
+  color: #ffffff;
+}
+
+:root.theme-brand .nl-ai-search-btn.is-ready {
+  background: linear-gradient(90deg, #0970b8, #05924a);
+  border-color: rgba(9, 112, 184, 0.7);
+  color: #ffffff;
+}
+
 :root.theme-brand .brand-dashboard-home .rounded-xl.border.border-white\/10.bg-slate-900\/90 {
   background:
     linear-gradient(165deg, rgba(5, 146, 74, 0.26) 0%, #ffffff 36%, rgba(9, 112, 184, 0.22) 100%) !important;
@@ -883,6 +925,27 @@
   background:
     linear-gradient(180deg, #f1f5f9 0%, rgba(5, 146, 74, 0.14) 48%, rgba(9, 112, 184, 0.14) 100%) !important;
   border: 1px solid rgba(9, 112, 184, 0.38) !important;
+}
+
+/* Dashboard filter rail: aligned visuals across dark/light/brand themes */
+:root.theme-dark .brand-dashboard-home .dashboard-filter-bar {
+  background: rgba(15, 23, 42, 0.88) !important;
+  border-color: rgba(148, 163, 184, 0.18) !important;
+}
+
+:root.theme-light:not(.theme-brand) .brand-dashboard-home .dashboard-filter-bar {
+  background: rgba(255, 255, 255, 0.96) !important;
+  border-color: rgba(148, 163, 184, 0.45) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95) !important;
+}
+
+:root.theme-brand .brand-dashboard-home .dashboard-filter-bar {
+  background:
+    linear-gradient(165deg, rgba(5, 146, 74, 0.2) 0%, #ffffff 36%, rgba(9, 112, 184, 0.2) 100%) !important;
+  border-color: rgba(9, 112, 184, 0.44) !important;
+  box-shadow:
+    0 0 0 1px rgba(5, 146, 74, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.92) !important;
 }
 
 :root.theme-brand .app-footer {

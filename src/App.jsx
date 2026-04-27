@@ -26,6 +26,15 @@ const defaultFeedbackFilters = () => ({
   priority: '',
 })
 
+const defaultDashboardFilters = () => ({
+  status: '',
+  sentiment: '',
+  input_type: '',
+  source_id: '',
+  department_id: '',
+  priority: '',
+})
+
 function App() {
   const { mode } = useTheme()
   const [token, setToken] = useState(localStorage.getItem('token') || '')
@@ -41,6 +50,7 @@ function App() {
   const [isDashboardAggregatesLoading, setIsDashboardAggregatesLoading] = useState(false)
   const [pagination, setPagination] = useState({ page: 1, page_size: 10, total: 0 })
   const [filters, setFilters] = useState(defaultFeedbackFilters)
+  const [dashboardFilters, setDashboardFilters] = useState(defaultDashboardFilters)
   const [adminUsers, setAdminUsers] = useState([])
   const [adminPager, setAdminPager] = useState({ page: 1, page_size: 10, total: 0, search: '' })
   const [roles, setRoles] = useState([])
@@ -261,7 +271,15 @@ function App() {
     dashboardSummaryInFlight.current = true
     setIsDashboardLoading(true)
     try {
-      const summary = await apiFetch('/dashboard/summary', { token })
+      const params = new URLSearchParams()
+      if (dashboardFilters.status) params.set('status', dashboardFilters.status)
+      if (dashboardFilters.sentiment) params.set('sentiment', dashboardFilters.sentiment)
+      if (dashboardFilters.input_type) params.set('input_type', dashboardFilters.input_type)
+      if (dashboardFilters.source_id) params.set('source_id', dashboardFilters.source_id)
+      if (dashboardFilters.department_id) params.set('department_id', dashboardFilters.department_id)
+      if (dashboardFilters.priority) params.set('priority', dashboardFilters.priority)
+      const query = params.toString()
+      const summary = await apiFetch(`/dashboard/summary${query ? `?${query}` : ''}`, { token })
       setDashboard(summary)
     } catch (err) {
       notify('error', err.message || 'Failed to refresh dashboard.')
@@ -294,7 +312,16 @@ function App() {
     }
 
     try {
-      const data = await apiFetch(`/dashboard/recent?page=${page}&page_size=${RECENT_PAGE_SIZE}`, { token })
+      const params = new URLSearchParams()
+      params.set('page', String(page))
+      params.set('page_size', String(RECENT_PAGE_SIZE))
+      if (dashboardFilters.status) params.set('status', dashboardFilters.status)
+      if (dashboardFilters.sentiment) params.set('sentiment', dashboardFilters.sentiment)
+      if (dashboardFilters.input_type) params.set('input_type', dashboardFilters.input_type)
+      if (dashboardFilters.source_id) params.set('source_id', dashboardFilters.source_id)
+      if (dashboardFilters.department_id) params.set('department_id', dashboardFilters.department_id)
+      if (dashboardFilters.priority) params.set('priority', dashboardFilters.priority)
+      const data = await apiFetch(`/dashboard/recent?${params}`, { token })
       setRecentTotal(data.total || 0)
       setRecentPage(data.page || page)
       const items = data.items || []
@@ -312,7 +339,15 @@ function App() {
     if (!token) return
     setIsDashboardAggregatesLoading(true)
     try {
-      const data = await apiFetch('/dashboard/aggregates', { token })
+      const params = new URLSearchParams()
+      if (dashboardFilters.status) params.set('status', dashboardFilters.status)
+      if (dashboardFilters.sentiment) params.set('sentiment', dashboardFilters.sentiment)
+      if (dashboardFilters.input_type) params.set('input_type', dashboardFilters.input_type)
+      if (dashboardFilters.source_id) params.set('source_id', dashboardFilters.source_id)
+      if (dashboardFilters.department_id) params.set('department_id', dashboardFilters.department_id)
+      if (dashboardFilters.priority) params.set('priority', dashboardFilters.priority)
+      const query = params.toString()
+      const data = await apiFetch(`/dashboard/aggregates${query ? `?${query}` : ''}`, { token })
       setDashboardAggregates(data)
     } catch (err) {
       setDashboardAggregates(null)
@@ -339,10 +374,21 @@ function App() {
   // Refresh KPIs + sidebar whenever auth or tab changes so submissions appear after tabbing around.
   useEffect(() => {
     if (!me || !token) return
+    if (activeTab !== 'dashboard') return
     refreshDashboard()
     loadDashboardAggregates()
     loadRecent({ page: 1, reset: true })
-  }, [me?.id, token, activeTab])
+  }, [
+    me?.id,
+    token,
+    activeTab,
+    dashboardFilters.status,
+    dashboardFilters.sentiment,
+    dashboardFilters.input_type,
+    dashboardFilters.source_id,
+    dashboardFilters.department_id,
+    dashboardFilters.priority,
+  ])
 
   useEffect(() => {
     if (!me) return
@@ -439,6 +485,7 @@ function App() {
     setToken('')
     setMe(null)
     setDashboard(null)
+    setDashboardFilters(defaultDashboardFilters())
     setFilters(defaultFeedbackFilters())
     setFeedbackRows([])
     setPagination({ page: 1, page_size: 10, total: 0 })
@@ -590,6 +637,33 @@ function App() {
       await loadRecent({ page: 1, reset: true })
     } catch (err) {
       notify('error', err.message || 'Failed to update feedback.')
+    }
+  }
+
+  const runNaturalLanguageFilterSearch = async (query) => {
+    const text = String(query || '').trim()
+    if (!text) {
+      notify('warning', 'Please enter a search query.')
+      return
+    }
+    try {
+      const data = await apiFetch('/feedback/natural-language-filters', {
+        method: 'POST',
+        body: JSON.stringify({ query: text }),
+        token,
+      })
+      feedbackFetchGen.current += 1
+      setIsFeedbackLoading(true)
+      setFeedbackRows([])
+      setPagination((p) => ({ ...p, page: 1 }))
+      paginationRef.current = { ...paginationRef.current, page: 1 }
+      const appliedFilters = { ...defaultFeedbackFilters(), ...(data?.filters || {}) }
+      setFilters(appliedFilters)
+      notify('success', 'AI filters applied.')
+      return appliedFilters
+    } catch (err) {
+      notify('error', err.message || 'Failed to apply AI filters.')
+      throw err
     }
   }
 
@@ -1078,6 +1152,16 @@ function App() {
                   canViewAnalysis={me.permissions.includes('feedback.analysis.view') || me.permissions.includes('system.superadmin')}
                   canViewCost={me.permissions.includes('ai.cost.view')}
                   onNavigateToBoard={goToFeedbackBoard}
+                  filters={dashboardFilters}
+                  setFilters={setDashboardFilters}
+                  onApplyFilters={async () => {
+                    await refreshDashboard()
+                    await loadDashboardAggregates()
+                    await loadRecent({ page: 1, reset: true })
+                  }}
+                  onResetFilters={() => setDashboardFilters(defaultDashboardFilters())}
+                  formMeta={formMeta}
+                  isFiltering={isDashboardLoading || isDashboardAggregatesLoading || isRecentLoading}
                   onViewAnalysis={(row) => {
                     if (!row) return
                     setAnalysisModalRow(row)
@@ -1147,6 +1231,11 @@ function App() {
                   canUpdate={me.permissions.includes('feedback.update')}
                   canViewCost={me.permissions.includes('ai.cost.view')}
                   canViewAnalysis={me.permissions.includes('feedback.analysis.view') || me.permissions.includes('system.superadmin')}
+                  canUseNaturalLanguageSearch={
+                    (activeTab === 'my_feedback' || activeTab === 'feedback_board') &&
+                    (me.permissions.includes('feedbackboard.naturallanguagesearch') || me.permissions.includes('system.superadmin'))
+                  }
+                  onNaturalLanguageSearch={runNaturalLanguageFilterSearch}
                   permissions={me.permissions || []}
                   onMark={updateFeedback}
                   hideDetails={activeTab === 'my_feedback'}
